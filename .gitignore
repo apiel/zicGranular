@@ -1,0 +1,5 @@
+.vscode/*.log
+.note.local
+.freesound.key
+.freesound.oauth.key
+demo.json
