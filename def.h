@@ -3,8 +3,9 @@
 
 #include <stdint.h>
 #include <string.h>
-#include <RtAudio.h>
 #include <unistd.h>
+#include <RtAudio.h>
+#include <RtMidi.h>
 
 #ifndef APP_LOG
 #define APP_LOG printf

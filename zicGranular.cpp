@@ -1,6 +1,7 @@
 #include "audioHandler.h"
 #include "def.h"
 
+std::vector<RtMidi::Api> apis;
 AudioHandler& audio = AudioHandler::get();
 
 // float lenDivider = 1.0f / sizeof(float);
@@ -22,14 +23,29 @@ void showAudioDeviceInfo()
     RtAudio audio;
     unsigned int deviceCount = audio.getDeviceCount();
 
+    printf("Found %d audio devices:\n\n", deviceCount);
     RtAudio::DeviceInfo rtInfo;
     for (unsigned int i = 0; i < deviceCount; i++) {
         rtInfo = audio.getDeviceInfo(i);
         if (rtInfo.probed == true) {
-            printf("Device %d: %s", i, rtInfo.name.c_str());
-            printf("  (chan: %d, sampleRate: %d)\n", rtInfo.outputChannels, rtInfo.preferredSampleRate);
+            // printf(" (%d) %s", i, rtInfo.name.c_str());
+            // printf("  (chan: %d, sampleRate: %d)\n", rtInfo.outputChannels, rtInfo.preferredSampleRate);
+            printf(" (%d) %s\n", i, rtInfo.name.c_str());
         }
     }
+    printf("\n");
+}
+
+void showMidiDeviceInfo()
+{
+    RtMidiIn midi;
+    unsigned int portCount = midi.getPortCount();
+
+    printf("Found %d midi devices:\n\n", portCount);
+    for (unsigned int i = 0; i < portCount; i++) {
+        printf(" (%d) %s\n", i, midi.getPortName(i).c_str());
+    }
+    printf("\n");
 }
 
 int main(int argc, char* args[])
@@ -41,6 +57,7 @@ int main(int argc, char* args[])
 
     if (strcmp(args[1], "--list") == 0) {
         showAudioDeviceInfo();
+        showMidiDeviceInfo();
         return 0;
     }
 
@@ -56,7 +73,7 @@ int main(int argc, char* args[])
     try {
         audio.openStream(&audioParams, NULL, APP_AUDIO_FORMAT, SAMPLE_RATE, &bufferFrames, &audioCallback);
         audio.startStream();
-        while(audio.isStreamRunning()) {
+        while (audio.isStreamRunning()) {
             usleep(100000); // 100ms
         }
     } catch (RtAudioError& e) {
