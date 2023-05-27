@@ -56,6 +56,9 @@ int main(int argc, char* args[])
     try {
         audio.openStream(&audioParams, NULL, APP_AUDIO_FORMAT, SAMPLE_RATE, &bufferFrames, &audioCallback);
         audio.startStream();
+        while(audio.isStreamRunning()) {
+            usleep(100000); // 100ms
+        }
     } catch (RtAudioError& e) {
         e.printMessage();
         return 1;

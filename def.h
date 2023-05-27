@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <RtAudio.h>
+#include <unistd.h>
 
 #ifndef APP_LOG
 #define APP_LOG printf

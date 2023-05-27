@@ -8,7 +8,9 @@ LIDSND=`pkg-config --cflags --libs sndfile`
 
 RTAUDIO=`pkg-config --cflags --libs rtaudio`
 
-BUILD=-Wall zicGranular.cpp -fopenmp -Wno-narrowing $(RTAUDIO) $(LIDSND)
+RTMIDI=`pkg-config --cflags --libs rtmidi`
+
+BUILD=-Wall zicGranular.cpp -fopenmp -Wno-narrowing $(RTAUDIO) $(LIDSND) $(RTMIDI)
 
 linux: build run
 
@@ -17,4 +19,4 @@ build:
 
 run:
 	echo start zicGranular
-	LD_LIBRARY_PATH=. ./zicGranular
+	LD_LIBRARY_PATH=. ./zicGranular 0
