@@ -1,8 +1,8 @@
-#include "audioHandler.h"
 #include "def.h"
+#include "audioHandler.h"
 
 std::vector<RtMidi::Api> apis;
-AudioHandler& audio = AudioHandler::get();
+AudioHandler& audioHandler = AudioHandler::get();
 
 // float lenDivider = 1.0f / sizeof(float);
 // void audioCallBack(void* userdata, Uint8* stream, int len)
@@ -14,13 +14,12 @@ AudioHandler& audio = AudioHandler::get();
 int audioCallback(void* outputBuffer, void* /*inputBuffer*/, unsigned int nBufferFrames,
     double /*streamTime*/, RtAudioStreamStatus status, void* data)
 {
-    audio.samples((float*)outputBuffer, nBufferFrames);
+    audioHandler.samples((float*)outputBuffer, nBufferFrames);
     return 0;
 }
 
 void showAudioDeviceInfo()
 {
-    RtAudio audio;
     unsigned int deviceCount = audio.getDeviceCount();
 
     printf("Found %d audio devices:\n\n", deviceCount);
@@ -36,16 +35,31 @@ void showAudioDeviceInfo()
     printf("\n");
 }
 
-void showMidiDeviceInfo()
+void midiCallback(double deltatime, std::vector<unsigned char>* message, void* userData)
 {
-    RtMidiIn midi;
-    unsigned int portCount = midi.getPortCount();
-
-    printf("Found %d midi devices:\n\n", portCount);
-    for (unsigned int i = 0; i < portCount; i++) {
-        printf(" (%d) %s\n", i, midi.getPortName(i).c_str());
+    unsigned int nBytes = message->size();
+    for (unsigned int i = 0; i < nBytes; i++) {
+        printf("%02x ", (int)message->at(i));
     }
     printf("\n");
+}
+
+bool loadMidiInput()
+{
+    unsigned int portCount = midi.getPortCount();
+
+    for (unsigned int i = 0; i < portCount; i++) {
+        if (midi.getPortName(i).find("FL STUDIO FIRE") != std::string::npos) {
+            midi.openPort(i);
+            midi.setCallback(&midiCallback);
+            midi.ignoreTypes(false, false, false);
+            printf("Midi input loaded: %s\n", midi.getPortName(i).c_str());
+            return true;
+        }
+    }
+
+    printf("FL STUDIO FIRE not found\n");
+    return false;
 }
 
 int main(int argc, char* args[])
@@ -57,13 +71,15 @@ int main(int argc, char* args[])
 
     if (strcmp(args[1], "--list") == 0) {
         showAudioDeviceInfo();
-        showMidiDeviceInfo();
         return 0;
+    }
+
+    if (loadMidiInput() == false) {
+        return 1;
     }
 
     unsigned int deviceId = atoi(args[1]);
 
-    RtAudio audio;
     RtAudio::StreamParameters audioParams;
 
     // TODO should sample rate come from RtAudio::DeviceInfo  ?

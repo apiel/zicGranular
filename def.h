@@ -1,11 +1,11 @@
 #ifndef _DEF_H_
 #define _DEF_H_
 
+#include <RtAudio.h>
+#include <RtMidi.h>
 #include <stdint.h>
 #include <string.h>
 #include <unistd.h>
-#include <RtAudio.h>
-#include <RtMidi.h>
 
 #ifndef APP_LOG
 #define APP_LOG printf
@@ -73,5 +73,8 @@
 #ifndef CLEAR
 #define CLEAR true
 #endif
+
+RtMidiIn midi;
+RtAudio audio;
 
 #endif
