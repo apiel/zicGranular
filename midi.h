@@ -2,10 +2,12 @@
 #define _MIDI_H_
 
 #include "def.h"
+#include "audioHandler.h"
 
 void onMidiNoteOn(uint8_t note, uint8_t velocity)
 {
     printf("Midi note on: %d %d\n", note, velocity);
+    AudioHandler::get().audioGranular.noteOn();
 }
 
 void onMidiNoteOff(uint8_t note, uint8_t velocity)

@@ -4,6 +4,7 @@
 #include "def.h"
 #include "master.h"
 #include "tempo.h"
+#include "audioGranular.h"
 
 class AudioHandler {
 protected:
@@ -15,6 +16,7 @@ protected:
 
 public:
     Tempo& tempo = Tempo::get();
+    AudioGranular audioGranular;
 
     uint8_t stepCounter = 0;
 
@@ -41,9 +43,9 @@ public:
         //     }
         // }
 
-        for (int j = 0; j < len; j++) {
-            buf[j] = 0.0f;
-        }
+        // for (int j = 0; j < len; j++) {
+        //     buf[j] = 0.0f;
+        // }
 
         // float* buffer = new float[len];
         // for (uint8_t i = 0; i < APP_TRACKS; i++) {
@@ -61,6 +63,8 @@ public:
         // for (int j = 0; j < len; j++) {
         //     buf[j] = master.filter.sample(buf[j]);
         // }
+
+        audioGranular.samples(buf, len);
     }
 };
 
