@@ -5,24 +5,14 @@
 
 #include "def.h"
 
-// Should we load sample in memory?
-// How long can we buffer? 10sec?
-// If not, we will read it from disk every time we need it.
-#define AUDIO_BUFFER_SECONDS 0 // 10
-
-#if AUDIO_BUFFER_SECONDS > 0
-// 10 seconds
+#define AUDIO_BUFFER_SECONDS 30
 #define LOAD_SAMPLE_IN_MEMORY 1
 #define AUDIO_BUFFER_SIZE SAMPLE_RATE* AUDIO_BUFFER_SECONDS
-#endif
 
 class AudioFile {
 protected:
-#if LOAD_SAMPLE_IN_MEMORY
     int samplePos = 0;
     float buffer[AUDIO_BUFFER_SIZE];
-#endif
-
     bool isOpen = false;
 
 public:
@@ -60,18 +50,14 @@ public:
         printf("Audio file %s sampleCount %ld sampleRate %d\n", filename, (long)sfinfo.frames, sfinfo.samplerate);
         isOpen = true;
 
-        sf_seek(file, 0, seek); 
-
-#if LOAD_SAMPLE_IN_MEMORY
         sf_read_float(file, buffer, AUDIO_BUFFER_SIZE);
-#endif
+        samplePos = sfinfo.frames;
 
         return *this;
     }
 
     int64_t samples(float* buf, int len)
     {
-#if LOAD_SAMPLE_IN_MEMORY
         int i = 0;
         for (; i < len; i++) {
             if (samplePos < sfinfo.frames) {
@@ -82,21 +68,11 @@ public:
             }
         }
         return i;
-#else
-        if (isOpen) {
-            return sf_read_float(file, buf, len);
-        }
-        return 0;
-#endif
     }
 
     AudioFile& restart()
     {
-#if LOAD_SAMPLE_IN_MEMORY
         samplePos = 0;
-#else
-        sf_seek(file, 0, SEEK_SET);
-#endif
         return *this;
     }
 };
