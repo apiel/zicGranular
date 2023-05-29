@@ -74,7 +74,7 @@ public:
         return i;
     }
 
-    AudioGranular& noteOn()
+    AudioGranular& noteOn(uint8_t note, uint8_t velocity)
     {
         samplePos = 0;
         return *this;
