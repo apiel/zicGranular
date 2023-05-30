@@ -1,8 +1,8 @@
 #ifndef _AUDIO_H_
 #define _AUDIO_H_
 
-#include "def.h"
 #include "audioHandler.h"
+#include "def.h"
 
 AudioHandler& audioHandler = AudioHandler::get();
 
@@ -16,7 +16,7 @@ AudioHandler& audioHandler = AudioHandler::get();
 int audioCallback(void* outputBuffer, void* /*inputBuffer*/, unsigned int nBufferFrames,
     double /*streamTime*/, RtAudioStreamStatus status, void* data)
 {
-    audioHandler.samples((float*)outputBuffer, nBufferFrames);
+    audioHandler.samples((float*)outputBuffer, nBufferFrames * APP_CHANNELS);
     return 0;
 }
 
@@ -36,6 +36,5 @@ void showAudioDeviceInfo()
     }
     printf("\n");
 }
-
 
 #endif
