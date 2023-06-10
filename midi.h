@@ -13,6 +13,7 @@ void onMidiNoteOn(uint8_t note, uint8_t velocity)
 void onMidiNoteOff(uint8_t note, uint8_t velocity)
 {
     printf("Midi note off: %d %d\n", note, velocity);
+    AudioHandler::get().audioGranular.noteOff(note, velocity);
 }
 
 void onMidiControlChange(uint8_t control, uint8_t value)
