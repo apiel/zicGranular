@@ -21,7 +21,7 @@ protected:
     float buffer[AUDIO_BUFFER_SIZE];
     bool isOpen = false;
 
-    struct grain {
+    struct Grain {
         float pos;
         int64_t start;
     } grains[MAX_GRAINS];
@@ -31,7 +31,7 @@ public:
     SNDFILE* file = NULL;
 
     uint8_t density = 1;
-    uint16_t grainSize = 1000; // 20ms to 1000ms
+    uint16_t grainSize = 50; // 20ms to 1000ms
     float window = 1.0f;
 
     AudioGranular()
@@ -92,39 +92,34 @@ public:
     {
         int i = 0;
 
-        if (samplePos < sfinfo.frames) {
-            buf[i] = buffer[(int)samplePos];
-            samplePos += sampleStep;
-        } else {
-            buf[i] = 0;
-        }
-
-        // if (on) {
-        //     for (; i < len; i++) {
-        //         // for (uint8_t d = 0; d < density; d++) {
-        //         for (uint8_t d = 0; d < 1; d++) {
-        //             // int64_t sample = (uint64_t)grains[d].pos + grains[d].start;
-        //             // if ((int64_t)grains[d].pos < grainSampleCount && sample < sfinfo.frames) {
-        //             //     grains[d].pos += sampleStep;
-        //             // } else {
-        //             //     grains[d].pos = 0.0f;
-        //             //     sample = grains[d].start;
-        //             // }
-        //             // buf[i] += buffer[sample];
-        //             int64_t sample = (uint64_t)grains[d].pos + grains[d].start;
-        //             if ((int64_t)grains[d].pos < grainSampleCount && sample < sfinfo.frames) {
-        //                 grains[d].pos += sampleStep;
-        //             buf[i] += buffer[sample];
-        //             } else {
-        //                 buf[i] = 0;
-        //             }
-        //         }
-        //     }
-        // } else {
-        //     for (; i < len; i++) {
+        // for (; i < len; i++) {
+        //     if (samplePos < sfinfo.frames) {
+        //         buf[i] = buffer[(int)samplePos];
+        //         samplePos += sampleStep;
+        //     } else {
         //         buf[i] = 0;
         //     }
         // }
+
+        if (on) {
+            for (; i < len; i++) {
+                Grain& grain = grains[0];
+                int64_t sample = (uint64_t)grain.pos + grain.start;
+                if (sample < sfinfo.frames && (int64_t)grain.pos < grainSampleCount) {
+                    grain.pos += sampleStep;
+                    buf[i] = buffer[sample];
+                } else {
+                    grain.pos = 0.0f;
+                    // here should set a random start in window
+                    buf[i] = 0;
+                }
+            }
+        } else {
+            for (; i < len; i++) {
+                buf[i] = 0;
+            }
+        }
+
         return i;
     }
 
