@@ -92,15 +92,6 @@ public:
     {
         int i = 0;
 
-        // for (; i < len; i++) {
-        //     if (samplePos < sfinfo.frames) {
-        //         buf[i] = buffer[(int)samplePos];
-        //         samplePos += sampleStep;
-        //     } else {
-        //         buf[i] = 0;
-        //     }
-        // }
-
         if (on) {
             for (; i < len; i++) {
                 Grain& grain = grains[0];
@@ -131,9 +122,8 @@ public:
         on = true;
 
         for (uint8_t d = 0; d < density; d++) {
-            grains[d].pos = 0.0f;
-            // grains[d].start = (uint64_t)(samplePos - grainSize * (1.0f - window) * 0.5f);
-            grains[d].start = 0;
+            grains[d].pos = 0.0f; // should pos be set in function of density ?
+            grains[d].start = 0; // start should be set randomly in window
         }
 
         // https://gist.github.com/YuxiUx/ef84328d95b10d0fcbf537de77b936cd
