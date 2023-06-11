@@ -108,17 +108,18 @@ public:
         if (on) {
             for (; i < len; i++) {
                 buf[i] = 0;
-
-                Grain& grain = grains[0];
-                if (grain.delay > 0) {
-                    grain.delay--;
-                } else {
-                    int64_t sample = (uint64_t)grain.pos + grain.start;
-                    if (sample < sfinfo.frames && (int64_t)grain.pos < grainSampleCount) { // is sample < sfinfo.frames even necessary if start calculated properly
-                        grain.pos += sampleStep;
-                        buf[i] += buffer[sample];
+                for(uint8_t d = 0; d < density; d++) {
+                    Grain& grain = grains[d];
+                    if (grain.delay > 0) {
+                        grain.delay--;
                     } else {
-                        initGrain(0);
+                        int64_t sample = (uint64_t)grain.pos + grain.start;
+                        if (sample < sfinfo.frames && (int64_t)grain.pos < grainSampleCount) { // is sample < sfinfo.frames even necessary if start calculated properly
+                            grain.pos += sampleStep;
+                            buf[i] += buffer[sample];
+                        } else {
+                            initGrain(d);
+                        }
                     }
                 }
             }
