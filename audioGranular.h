@@ -33,8 +33,9 @@ protected:
     void initGrain(uint8_t index)
     {
         Grain& grain = grains[index];
-        grain.pos = 0.0f; // should pos be set in function of density ?
-        grain.start = 0; // start should be set randomly in spray
+        grain.pos = 0.0f;
+        // grain.start = 0; // start should be set randomly in spray
+        grain.start = (rand() % spray) * SAMPLE_RATE * 0.001f;
         grain.delay = (rand() % 200) * SAMPLE_RATE * 0.001f; // 10ms, but this could be random
     }
 
@@ -44,7 +45,7 @@ public:
 
     uint8_t density = 1;
     uint16_t grainSize = 50; // 20ms to 1000ms
-    float spray = 1.0f;
+    uint16_t spray = 100;
 
     AudioGranular()
     {
