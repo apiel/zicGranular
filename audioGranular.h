@@ -43,20 +43,21 @@ public:
     SF_INFO sfinfo;
     SNDFILE* file = NULL;
 
-    uint8_t density = 1;
-    uint16_t grainSize = 50; // 20ms to 1000ms
-    uint16_t spray = 100;
+    uint8_t density = 4;
+    uint16_t grainSize = 300; // 20ms to 1000ms
+    uint16_t spray = 1000;
 
     AudioGranular()
     {
         memset(&sfinfo, 0, sizeof(sfinfo));
 
         // open("samples/0_squeaky.wav");
-        // open("samples/0_fx_01.wav");
+        open("samples/0_squeak.wav");
+        // open("samples/0_altaopa.wav");
         // open("samples/0_axxe13.wav");
-        // open("samples/bass02.wav");
+        // open("samples/0_ir0nwave.wav");
         // open("samples/bass03.wav");
-        open("samples/kick.wav");
+        // open("samples/kick.wav");
 
         setGrainSize(grainSize);
     }
