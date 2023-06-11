@@ -3,6 +3,9 @@
 
 #include <sndfile.h>
 
+#include <cstdlib>
+using namespace std;
+
 #include "def.h"
 
 #define AUDIO_BUFFER_SECONDS 30
@@ -32,7 +35,7 @@ protected:
         Grain& grain = grains[index];
         grain.pos = 0.0f; // should pos be set in function of density ?
         grain.start = 0; // start should be set randomly in spray
-        grain.delay = 10 * SAMPLE_RATE * 0.001f; // 10ms, but this could be random
+        grain.delay = (rand() % 200) * SAMPLE_RATE * 0.001f; // 10ms, but this could be random
     }
 
 public:
@@ -103,18 +106,18 @@ public:
 
         if (on) {
             for (; i < len; i++) {
+                buf[i] = 0;
+
                 Grain& grain = grains[0];
                 if (grain.delay > 0) {
                     grain.delay--;
-                    buf[i] = 0;
                 } else {
                     int64_t sample = (uint64_t)grain.pos + grain.start;
                     if (sample < sfinfo.frames && (int64_t)grain.pos < grainSampleCount) { // is sample < sfinfo.frames even necessary if start calculated properly
                         grain.pos += sampleStep;
-                        buf[i] = buffer[sample];
+                        buf[i] += buffer[sample];
                     } else {
                         initGrain(0);
-                        buf[i] = 0;
                     }
                 }
             }
