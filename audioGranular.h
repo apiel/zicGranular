@@ -24,7 +24,16 @@ protected:
     struct Grain {
         float pos;
         int64_t start;
+        int64_t delay;
     } grains[MAX_GRAINS];
+
+    void initGrain(uint8_t index)
+    {
+        Grain& grain = grains[index];
+        grain.pos = 0.0f; // should pos be set in function of density ?
+        grain.start = 0; // start should be set randomly in spray
+        grain.delay = 10 * SAMPLE_RATE * 0.001f; // 10ms, but this could be random
+    }
 
 public:
     SF_INFO sfinfo;
@@ -32,7 +41,7 @@ public:
 
     uint8_t density = 1;
     uint16_t grainSize = 50; // 20ms to 1000ms
-    float window = 1.0f;
+    float spray = 1.0f;
 
     AudioGranular()
     {
@@ -95,14 +104,18 @@ public:
         if (on) {
             for (; i < len; i++) {
                 Grain& grain = grains[0];
-                int64_t sample = (uint64_t)grain.pos + grain.start;
-                if (sample < sfinfo.frames && (int64_t)grain.pos < grainSampleCount) {
-                    grain.pos += sampleStep;
-                    buf[i] = buffer[sample];
-                } else {
-                    grain.pos = 0.0f;
-                    // here should set a random start in window
+                if (grain.delay > 0) {
+                    grain.delay--;
                     buf[i] = 0;
+                } else {
+                    int64_t sample = (uint64_t)grain.pos + grain.start;
+                    if (sample < sfinfo.frames && (int64_t)grain.pos < grainSampleCount) { // is sample < sfinfo.frames even necessary if start calculated properly
+                        grain.pos += sampleStep;
+                        buf[i] = buffer[sample];
+                    } else {
+                        initGrain(0);
+                        buf[i] = 0;
+                    }
                 }
             }
         } else {
@@ -122,8 +135,7 @@ public:
         on = true;
 
         for (uint8_t d = 0; d < density; d++) {
-            grains[d].pos = 0.0f; // should pos be set in function of density ?
-            grains[d].start = 0; // start should be set randomly in window
+            initGrain(d);
         }
 
         // https://gist.github.com/YuxiUx/ef84328d95b10d0fcbf537de77b936cd
@@ -143,5 +155,20 @@ public:
         return *this;
     }
 };
+
+// Length (or similar word): the length of the grain in ms or Hz
+// Position (or similar word): the start point of the grain located in the original audio sample
+// Smoothing (or similar word): adjusts the crossfades between grains
+// Distance (or similar word): increase or decrease gaps of time between the grains
+// Density (or similar word): the number of grains that are played at the same time
+// Pitch (or similar word): the pitch of the grain
+// Pan (or similar word): the panning of the grain
+// Volume (or similar word): the volume of the grain
+// “Grain” - measured in Hz on Granulator II, defines the length of the grain (aka “Length”)
+// “Grain Random” - measured from 0 to 100, randomizes the length of the grain
+// “FilePos” - the start point of the grain, located within the sample (aka “Position”)
+// “Spray” - measured in ms, randomizes Position within x ms of FilePos
+// Spray (or similar word): the randomization of the start point of the grain
+// “Freq” - simply the cutoff freq of a LFP filter on the filter page, I’m automating this frequency
 
 #endif
