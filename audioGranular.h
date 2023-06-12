@@ -44,7 +44,7 @@ public:
     SNDFILE* file = NULL;
 
     uint8_t density = 4;
-    uint16_t grainSize = 300; // 20ms to 1000ms
+    uint16_t grainSize = 300;
     uint16_t spray = 1000;
 
     AudioGranular()
@@ -67,11 +67,44 @@ public:
         close();
     }
 
-    AudioGranular& setGrainSize(uint16_t grainSize)
+    /**
+     * @brief Set the Grain Size meaning the length duration of the grain in ms.
+     *
+     * @param grainSize in ms
+     * @return AudioGranular&
+     */
+    AudioGranular& setGrainSize(uint16_t _grainSize)
     {
-        this->grainSize = grainSize;
-        grainSampleCount = grainSize * SAMPLE_RATE * 0.001f;
-        printf("grainSize %dms grainSampleCount %ld\n", grainSize, (long)grainSampleCount);
+        grainSize = range(_grainSize, 20, 30000); // should it be between 20 and 1000?
+        grainSampleCount = _grainSize * SAMPLE_RATE * 0.001f;
+        printf("grainSampleCount %ld grainSize %d ms\n", grainSampleCount, grainSize);
+        return *this;
+    }
+
+    /**
+     * @brief Set the Spray of the grain start position, giving +/- ms random position to
+     * the grain start position.
+     *
+     * @param spray in ms
+     * @return AudioGranular&
+     */
+    AudioGranular& setSpray(uint16_t _spray)
+    {
+        spray = range(_spray, 0, 30000); // should it be between 0 and 1000?
+        printf("spray %d ms\n", spray);
+        return *this;
+    }
+
+    /**
+     * @brief Set the Density meaning the number of grains that are played at the same time.
+     *
+     * @param density
+     * @return AudioGranular&
+     */
+    AudioGranular& setDensity(uint8_t _density)
+    {
+        density = range(_density, 1, MAX_GRAINS);
+        printf("density %d\n", density);
         return *this;
     }
 
@@ -109,7 +142,7 @@ public:
         if (on) {
             for (; i < len; i++) {
                 buf[i] = 0;
-                for(uint8_t d = 0; d < density; d++) {
+                for (uint8_t d = 0; d < density; d++) {
                     Grain& grain = grains[d];
                     if (grain.delay > 0) {
                         grain.delay--;
