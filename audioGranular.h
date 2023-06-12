@@ -53,13 +53,13 @@ public:
     {
         memset(&sfinfo, 0, sizeof(sfinfo));
 
-        // open("samples/0_squeaky.wav");
         // open("samples/0_squeak.wav");
         // open("samples/0_altaopa.wav");
-        // open("samples/0_axxe13.wav");
-        // open("samples/0_ir0nwave.wav");
+        open("samples/0_axxe13.wav");
         // open("samples/bass03.wav");
-        open("samples/kick.wav");
+        // open("samples/0_squeaky.wav");
+        // open("samples/0_ir0nwave.wav");
+        // open("samples/kick.wav");
 
         setGrainSize(grainSize);
     }
@@ -176,7 +176,8 @@ public:
                         grain.delay--;
                     } else {
                         int64_t sample = (uint64_t)grain.pos + grain.start;
-                        if (sample < sfinfo.frames && (int64_t)grain.pos < grainSampleCount) { // is sample < sfinfo.frames even necessary if start calculated properly
+                        // if (sample < sfinfo.frames && (int64_t)grain.pos < grainSampleCount) { // is sample < sfinfo.frames even necessary if start calculated properly
+                        if ((int64_t)grain.pos < grainSampleCount) { // is sample < sfinfo.frames even necessary if start calculated properly
                             grain.pos += sampleStep;
                             buf[i] += buffer[sample];
                         } else {

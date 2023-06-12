@@ -47,7 +47,7 @@ void onMidiControlChange0(uint8_t control, int8_t direction)
         break;
 
     case 19:
-        granular.setDelay(granular.delay + direction);
+        granular.setStart(granular.start + direction);
         break;
 
     default:
@@ -60,7 +60,7 @@ void onMidiControlChange1(uint8_t control, int8_t direction)
     AudioGranular& granular = AudioHandler::get().audioGranular;
     switch (control) {
     case 16:
-        granular.setStart(granular.start + direction);
+        granular.setDelay(granular.delay + direction);
         break;
 
     default:
