@@ -35,7 +35,7 @@ protected:
         Grain& grain = grains[index];
         grain.pos = 0.0f;
         // grain.start = 0; // start should be set randomly in spray
-        grain.start = (rand() % spray) * SAMPLE_RATE * 0.001f;
+        grain.start = spray ? ((rand() % spray) * SAMPLE_RATE * 0.001f) : 0;
         grain.delay = (rand() % 200) * SAMPLE_RATE * 0.001f; // 10ms, but this could be random
     }
 
@@ -73,7 +73,7 @@ public:
      * @param grainSize in ms
      * @return AudioGranular&
      */
-    AudioGranular& setGrainSize(uint16_t _grainSize)
+    AudioGranular& setGrainSize(int32_t _grainSize)
     {
         grainSize = range(_grainSize, 20, 30000); // should it be between 20 and 1000?
         grainSampleCount = _grainSize * SAMPLE_RATE * 0.001f;
@@ -88,7 +88,7 @@ public:
      * @param spray in ms
      * @return AudioGranular&
      */
-    AudioGranular& setSpray(uint16_t _spray)
+    AudioGranular& setSpray(int32_t _spray)
     {
         spray = range(_spray, 0, 30000); // should it be between 0 and 1000?
         printf("spray %d ms\n", spray);
