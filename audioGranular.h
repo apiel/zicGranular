@@ -34,9 +34,9 @@ protected:
     {
         Grain& grain = grains[index];
         grain.pos = 0.0f;
-        // grain.start = 0; // start should be set randomly in spray
-        grain.start = spray ? ((rand() % spray) * SAMPLE_RATE * 0.001f) : 0;
-        grain.delay = (rand() % 200) * SAMPLE_RATE * 0.001f; // 10ms, but this could be random
+        uint16_t _spray = spray ? ((spray - (rand() % (spray * 2))) * SAMPLE_RATE * 0.001f) : 0;
+        grain.start = range(start + _spray, 0, sfinfo.frames);
+        grain.delay = delay ? ((rand() % delay) * SAMPLE_RATE * 0.001f) : 0;
     }
 
 public:
@@ -46,18 +46,20 @@ public:
     uint8_t density = 4;
     uint16_t grainSize = 300;
     uint16_t spray = 1000;
+    uint16_t delay = 0;
+    uint16_t start = 0;
 
     AudioGranular()
     {
         memset(&sfinfo, 0, sizeof(sfinfo));
 
         // open("samples/0_squeaky.wav");
-        open("samples/0_squeak.wav");
+        // open("samples/0_squeak.wav");
         // open("samples/0_altaopa.wav");
         // open("samples/0_axxe13.wav");
         // open("samples/0_ir0nwave.wav");
         // open("samples/bass03.wav");
-        // open("samples/kick.wav");
+        open("samples/kick.wav");
 
         setGrainSize(grainSize);
     }
@@ -105,6 +107,32 @@ public:
     {
         density = range(_density, 1, MAX_GRAINS);
         printf("density %d\n", density);
+        return *this;
+    }
+
+    /**
+     * @brief Set the Delay before grain start to play
+     *
+     * @param delay in ms
+     * @return AudioGranular&
+     */
+    AudioGranular& setDelay(int32_t _delay)
+    {
+        delay = range(_delay, 0, 30000); // should it be between 0 and 1000?
+        printf("delay %d ms\n", delay);
+        return *this;
+    }
+
+    /**
+     * @brief Set the Start position of the sample to play
+     *
+     * @param start in ms
+     * @return AudioGranular&
+     */
+    AudioGranular& setStart(int32_t _start)
+    {
+        start = range(_start, 0, 30000); // should it be between 0 and 1000?
+        printf("start %d ms\n", start);
         return *this;
     }
 
