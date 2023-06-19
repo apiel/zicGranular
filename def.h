@@ -75,7 +75,8 @@
 #define CLEAR true
 #endif
 
-RtMidiIn midi;
+RtMidiIn midiKeyboard;
+RtMidiIn midiController;
 RtAudio audio;
 
 float midiFreq[128] = {

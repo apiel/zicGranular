@@ -199,7 +199,7 @@ public:
 
     AudioGranular& noteOn(uint8_t note, uint8_t velocity)
     {
-        samplePos = 0; // to be removed
+        // samplePos = 0; // to be removed
         on = true;
 
         for (uint8_t d = 0; d < density; d++) {

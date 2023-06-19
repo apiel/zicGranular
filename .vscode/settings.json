@@ -58,6 +58,7 @@
         "thread": "cpp",
         "cinttypes": "cpp",
         "list": "cpp",
-        "valarray": "cpp"
+        "valarray": "cpp",
+        "set": "cpp"
     }
 }
