@@ -11,13 +11,17 @@ using namespace std;
 #define AUDIO_BUFFER_SECONDS 30
 #define LOAD_SAMPLE_IN_MEMORY 1
 #define AUDIO_BUFFER_SIZE SAMPLE_RATE* AUDIO_BUFFER_SECONDS
-#define MAX_GRAINS 24
+#define MAX_GRAINS_PER_VOICE 24
+#define MAX_GRAIN_VOICES 4
+
+class AudioGrainVoice {
+    
+};
 
 class AudioGranular {
 protected:
     bool on = false;
 
-    float samplePos = 0;
     float sampleStep = 1.0f;
     int64_t grainSampleCount = 0;
 
@@ -28,7 +32,7 @@ protected:
         float pos;
         int64_t start;
         int64_t delay;
-    } grains[MAX_GRAINS];
+    } grains[MAX_GRAINS_PER_VOICE];
 
     void initGrain(uint8_t index)
     {
@@ -105,7 +109,7 @@ public:
      */
     AudioGranular& setDensity(uint8_t _density)
     {
-        density = range(_density, 1, MAX_GRAINS);
+        density = range(_density, 1, MAX_GRAINS_PER_VOICE);
         printf("density %d\n", density);
         return *this;
     }
@@ -158,7 +162,6 @@ public:
         isOpen = true;
 
         sf_read_float(file, buffer, AUDIO_BUFFER_SIZE);
-        samplePos = sfinfo.frames;
 
         return *this;
     }
@@ -199,9 +202,6 @@ public:
 
     AudioGranular& noteOn(uint8_t note, uint8_t velocity)
     {
-        // samplePos = 0; // to be removed
-        on = true;
-
         for (uint8_t d = 0; d < density; d++) {
             initGrain(d);
         }
@@ -213,6 +213,9 @@ public:
         // ...
         sampleStep = pow(2, ((note - baseNote) / 12.0));
         printf("noteOn: %d %d %f\n", note, velocity, sampleStep);
+
+        on = true;
+
         return *this;
     }
 
