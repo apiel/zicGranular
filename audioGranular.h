@@ -26,17 +26,15 @@ protected:
     int64_t grainSampleCount = 0;
 
     float buffer[AUDIO_BUFFER_SIZE];
-    bool isOpen = false;
 
     struct Grain {
         float pos;
         int64_t start;
         int64_t delay;
-    } grains[MAX_GRAINS_PER_VOICE];
+    } grains[MAX_GRAIN_VOICES][MAX_GRAINS_PER_VOICE];
 
-    void initGrain(uint8_t index)
+    void initGrain(Grain& grain)
     {
-        Grain& grain = grains[index];
         grain.pos = 0.0f;
         uint16_t _spray = spray ? ((spray - (rand() % (spray * 2))) * SAMPLE_RATE * 0.001f) : 0;
         grain.start = range(start + _spray, 0, sfinfo.frames);
@@ -142,7 +140,6 @@ public:
 
     AudioGranular& close()
     {
-        isOpen = false;
         if (file) {
             sf_close(file);
         }
@@ -159,7 +156,6 @@ public:
             return *this;
         }
         printf("Audio file %s sampleCount %ld sampleRate %d\n", filename, (long)sfinfo.frames, sfinfo.samplerate);
-        isOpen = true;
 
         sf_read_float(file, buffer, AUDIO_BUFFER_SIZE);
 
@@ -169,12 +165,13 @@ public:
     int64_t samples(float* buf, int len)
     {
         int i = 0;
+        uint8_t voice = 0;
 
         if (on) {
             for (; i < len; i++) {
                 buf[i] = 0;
                 for (uint8_t d = 0; d < density; d++) {
-                    Grain& grain = grains[d];
+                    Grain& grain = grains[voice][d];
                     if (grain.delay > 0) {
                         grain.delay--;
                     } else {
@@ -184,7 +181,7 @@ public:
                             grain.pos += sampleStep;
                             buf[i] += buffer[sample];
                         } else {
-                            initGrain(d);
+                            initGrain(grain);
                         }
                     }
                 }
@@ -202,8 +199,9 @@ public:
 
     AudioGranular& noteOn(uint8_t note, uint8_t velocity)
     {
+        uint8_t voice = 0;
         for (uint8_t d = 0; d < density; d++) {
-            initGrain(d);
+            initGrain(grains[voice][d]);
         }
 
         // https://gist.github.com/YuxiUx/ef84328d95b10d0fcbf537de77b936cd
