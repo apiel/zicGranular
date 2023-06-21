@@ -14,10 +14,6 @@ using namespace std;
 #define MAX_GRAINS_PER_VOICE 24
 #define MAX_GRAIN_VOICES 4
 
-class AudioGrainVoice {
-    
-};
-
 class AudioGranular {
 protected:
     bool on = false;
