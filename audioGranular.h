@@ -37,6 +37,27 @@ protected:
         grain.delay = delay ? ((rand() % delay) * SAMPLE_RATE * 0.001f) : 0;
     }
 
+    float sample(uint8_t voice)
+    {
+        float sample = 0.0f;
+        for (uint8_t d = 0; d < density; d++) {
+            Grain& grain = grains[voice][d];
+            if (grain.delay > 0) {
+                grain.delay--;
+            } else {
+                int64_t samplePos = (uint64_t)grain.pos + grain.start;
+                // if (samplePos < sfinfo.frames && (int64_t)grain.pos < grainSampleCount) { // is samplePos < sfinfo.frames even necessary if start calculated properly
+                if ((int64_t)grain.pos < grainSampleCount) {
+                    grain.pos += sampleStep;
+                    sample += buffer[samplePos];
+                } else {
+                    initGrain(grain);
+                }
+            }
+        }
+        return sample;
+    }
+
 public:
     SF_INFO sfinfo;
     SNDFILE* file = NULL;
@@ -165,22 +186,7 @@ public:
 
         if (on) {
             for (; i < len; i++) {
-                buf[i] = 0;
-                for (uint8_t d = 0; d < density; d++) {
-                    Grain& grain = grains[voice][d];
-                    if (grain.delay > 0) {
-                        grain.delay--;
-                    } else {
-                        int64_t sample = (uint64_t)grain.pos + grain.start;
-                        // if (sample < sfinfo.frames && (int64_t)grain.pos < grainSampleCount) { // is sample < sfinfo.frames even necessary if start calculated properly
-                        if ((int64_t)grain.pos < grainSampleCount) { // is sample < sfinfo.frames even necessary if start calculated properly
-                            grain.pos += sampleStep;
-                            buf[i] += buffer[sample];
-                        } else {
-                            initGrain(grain);
-                        }
-                    }
-                }
+                buf[i] = sample(voice);
             }
         } else {
             for (; i < len; i++) {
