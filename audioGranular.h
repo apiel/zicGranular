@@ -18,19 +18,24 @@ class AudioGranular {
 protected:
     bool on = false;
 
-    float sampleStep = 1.0f;
     int64_t grainSampleCount = 0;
-
     float buffer[AUDIO_BUFFER_SIZE];
 
     struct Grain {
         float pos;
         int64_t start;
         int64_t delay;
+        float sampleStep;
     } grains[MAX_GRAIN_VOICES][MAX_GRAINS_PER_VOICE];
 
     void initGrain(Grain& grain)
     {
+        initGrain(grain, grain.sampleStep);
+    }
+
+    void initGrain(Grain& grain, float sampleStep)
+    {
+        grain.sampleStep = sampleStep;
         grain.pos = 0.0f;
         uint16_t _spray = spray ? ((spray - (rand() % (spray * 2))) * SAMPLE_RATE * 0.001f) : 0;
         grain.start = range(start + _spray, 0, sfinfo.frames);
@@ -48,7 +53,7 @@ protected:
                 int64_t samplePos = (uint64_t)grain.pos + grain.start;
                 // if (samplePos < sfinfo.frames && (int64_t)grain.pos < grainSampleCount) { // is samplePos < sfinfo.frames even necessary if start calculated properly
                 if ((int64_t)grain.pos < grainSampleCount) {
-                    grain.pos += sampleStep;
+                    grain.pos += grain.sampleStep;
                     sample += buffer[samplePos];
                 } else {
                     initGrain(grain);
@@ -201,9 +206,11 @@ public:
 
     AudioGranular& noteOn(uint8_t note, uint8_t velocity)
     {
-        uint8_t voice = 0;
+        float sampleStep = pow(2, ((note - baseNote) / 12.0));
+
+        uint8_t voice = 0;        
         for (uint8_t d = 0; d < density; d++) {
-            initGrain(grains[voice][d]);
+            initGrain(grains[voice][d], sampleStep);
         }
 
         // https://gist.github.com/YuxiUx/ef84328d95b10d0fcbf537de77b936cd
@@ -211,7 +218,7 @@ public:
         // pow(2, ((note - 1) / 12.0)) = 1.059463094 for 1 semitone
         // pow(2, ((note - 2) / 12.0)) = 1.122462048 for 2 semitone
         // ...
-        sampleStep = pow(2, ((note - baseNote) / 12.0));
+        
         printf("noteOn: %d %d %f\n", note, velocity, sampleStep);
 
         on = true;
