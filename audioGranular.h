@@ -16,10 +16,9 @@ using namespace std;
 
 class AudioGranular {
 protected:
-    bool on = false;
-
     int64_t grainSampleCount = 0;
     float buffer[AUDIO_BUFFER_SIZE];
+    int8_t notesOn[MAX_GRAIN_VOICES] = { -1, -1, -1, -1 };
 
     struct Grain {
         float pos;
@@ -27,6 +26,17 @@ protected:
         int64_t delay;
         float sampleStep;
     } grains[MAX_GRAIN_VOICES][MAX_GRAINS_PER_VOICE];
+
+    uint8_t baseNote = 110;
+    float getSampleStep(uint8_t note)
+    {
+        // https://gist.github.com/YuxiUx/ef84328d95b10d0fcbf537de77b936cd
+        // pow(2, ((note - 0) / 12.0)) = 1 for 0 semitone
+        // pow(2, ((note - 1) / 12.0)) = 1.059463094 for 1 semitone
+        // pow(2, ((note - 2) / 12.0)) = 1.122462048 for 2 semitone
+        // ...
+        return pow(2, ((note - baseNote) / 12.0));
+    }
 
     void initGrain(Grain& grain)
     {
@@ -187,49 +197,53 @@ public:
     int64_t samples(float* buf, int len)
     {
         int i = 0;
-        uint8_t voice = 0;
 
-        if (on) {
-            for (; i < len; i++) {
-                buf[i] = sample(voice);
-            }
-        } else {
-            for (; i < len; i++) {
-                buf[i] = 0;
+        for (; i < len; i++) {
+            buf[i] = 0;
+        }
+
+        for (uint8_t voice = 0; voice < MAX_GRAIN_VOICES; voice++) {
+            if (notesOn[voice] != -1) {
+                for (i = 0; i < len; i++) {
+                    buf[i] += sample(voice);
+                }
             }
         }
 
         return i;
     }
 
-    uint8_t baseNote = 110;
-
     AudioGranular& noteOn(uint8_t note, uint8_t velocity)
     {
-        float sampleStep = pow(2, ((note - baseNote) / 12.0));
-
-        uint8_t voice = 0;        
-        for (uint8_t d = 0; d < density; d++) {
-            initGrain(grains[voice][d], sampleStep);
+        for (uint8_t voice = 0; voice < MAX_GRAIN_VOICES; voice++) {
+            if (notesOn[voice] == -1) {
+                notesOn[voice] = note;
+                float sampleStep = getSampleStep(note);
+                for (uint8_t d = 0; d < density; d++) {
+                    initGrain(grains[voice][d], sampleStep);
+                }
+                printf("noteOn: %d %d %f\n", note, velocity, sampleStep);
+                return *this;
+            }
         }
 
-        // https://gist.github.com/YuxiUx/ef84328d95b10d0fcbf537de77b936cd
-        // pow(2, ((note - 0) / 12.0)) = 1 for 0 semitone
-        // pow(2, ((note - 1) / 12.0)) = 1.059463094 for 1 semitone
-        // pow(2, ((note - 2) / 12.0)) = 1.122462048 for 2 semitone
-        // ...
-        
-        printf("noteOn: %d %d %f\n", note, velocity, sampleStep);
-
-        on = true;
+        // TODO voice stealing
+        printf("noteOn: no voice available. Need to implement voice stealing...\n");
 
         return *this;
     }
 
     AudioGranular& noteOff(uint8_t note, uint8_t velocity)
     {
-        on = false;
-        printf("noteOff set on to false: %d %d\n", note, velocity);
+        for (uint8_t voice = 0; voice < MAX_GRAIN_VOICES; voice++) {
+            if (notesOn[voice] == note) {
+                notesOn[voice] = -1;
+                printf("noteOff set on to false: %d %d\n", note, velocity);
+                return *this;
+            }
+        }
+
+        printf("noteOff: note not found %d %d\n", note, velocity);
         return *this;
     }
 };
