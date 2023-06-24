@@ -178,7 +178,6 @@ public:
         return *this;
     }
 
-    // By default, move to the end of the sample to avoid unwanted playback.
     AudioGranular& open(const char* filename, int seek = SEEK_END)
     {
         close();
@@ -244,6 +243,14 @@ public:
         }
 
         printf("noteOff: note not found %d %d\n", note, velocity);
+        return *this;
+    }
+
+    AudioGranular& allOff()
+    {
+        for (uint8_t voice = 0; voice < MAX_GRAIN_VOICES; voice++) {
+            notesOn[voice] = -1;
+        }
         return *this;
     }
 };
