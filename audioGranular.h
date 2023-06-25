@@ -31,7 +31,8 @@ protected:
     struct Voice {
         int8_t note = -1;
         Grain grains[MAX_GRAINS_PER_VOICE];
-        float (AudioGranular::*envelop)() = &AudioGranular::envelopSustain;
+        float (AudioGranular::*envelop)(Voice& voice) = &AudioGranular::envelopSustain;
+        float env = 0.0f;
     } voices[MAX_GRAIN_VOICES];
 
     uint8_t baseNote = 60;
@@ -59,15 +60,41 @@ protected:
         grain.delay = delay ? ((rand() % delay) * SAMPLE_RATE * 0.001f) : 0;
     }
 
-    float envelopSustain()
+    float envelopAttack(Voice& voice)
     {
-        return 1.0;
+        voice.env += attackStep;
+        if (voice.env >= 1.0f) {
+            voice.env = 1.0f;
+            voice.envelop = &AudioGranular::envelopSustain;
+            // printf("envelopAttack finished, set env to %f\n", voice.env);
+        }
+        return voice.env;
+    }
+
+    float envelopSustain(Voice& voice)
+    {
+        return voice.env;
+    }
+
+    float envelopRelease(Voice& voice)
+    {
+        voice.env -= releaseStep;
+        if (voice.env <= 0.0f) {
+            voice.env = 0.0f;
+            voice.note = -1;
+            // printf("envelopRelease finished, set env to %f\n", voice.env);
+        }
+        return voice.env;
     }
 
     float sample(Voice& voice)
     {
         float sample = 0.0f;
-        float env = (this->*voice.envelop)();
+        float env = (this->*voice.envelop)(voice);
+        if (env <= 0.0f) {
+            return sample;
+        }
+
         for (uint8_t d = 0; d < density; d++) {
             Grain& grain = voice.grains[d];
             if (grain.delay > 0) {
@@ -95,8 +122,8 @@ public:
     uint16_t spray = 1000;
     uint16_t delay = 0;
     uint16_t start = 0;
-    float attack = 0.3f;
-    float release = 1.0f;
+    uint16_t attack = 300;
+    uint16_t release = 1000;
 
     AudioGranular()
     {
@@ -199,7 +226,7 @@ public:
         attack = range(_attack, 0, 5000);
         uint64_t attackSamples = attack * SAMPLE_RATE * 0.001f;
         attackStep = 1.0f / attackSamples;
-        printf("attack %f ms %ld samples\n", attack, attackSamples);
+        printf("attack %d ms %ld samples %f step\n", attack, attackSamples, attackStep);
         return *this;
     }
 
@@ -214,7 +241,7 @@ public:
         release = range(_release, 0, 10000);
         uint64_t releaseSamples = release * SAMPLE_RATE * 0.001f;
         releaseStep = 1.0f / releaseSamples;
-        printf("release %f ms %ld samples\n", release, releaseSamples);
+        printf("release %d ms %ld samples %f step\n", release, releaseSamples, releaseStep);
         return *this;
     }
 
@@ -269,6 +296,9 @@ public:
             Voice& voice = voices[v];
             if (voice.note == -1) {
                 voice.note = note;
+                voice.envelop = &AudioGranular::envelopAttack;
+                // voice.envelop = &AudioGranular::envelopSustain;
+                // voice.env = 1.0f;
                 float sampleStep = getSampleStep(note);
                 for (uint8_t g = 0; g < density; g++) {
                     initGrain(voice.grains[g], sampleStep);
@@ -289,7 +319,9 @@ public:
         for (uint8_t v = 0; v < MAX_GRAIN_VOICES; v++) {
             Voice& voice = voices[v];
             if (voice.note == note) {
-                voice.note = -1;
+                // TODO really implement voice stealing
+                // voice.note = -1; 
+                voice.envelop = &AudioGranular::envelopRelease;
                 printf("noteOff set on to false: %d %d\n", note, velocity);
                 return *this;
             }
