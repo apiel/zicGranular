@@ -18,7 +18,6 @@ class AudioGranular {
 protected:
     int64_t grainSampleCount = 0;
     float buffer[AUDIO_BUFFER_SIZE];
-    int8_t notesOn[MAX_GRAIN_VOICES] = { -1, -1, -1, -1 };
     float attackStep = 0.0f;
     float releaseStep = 0.0f;
 
@@ -29,12 +28,10 @@ protected:
         float sampleStep;
     };
 
-    struct Voice
-    {
+    struct Voice {
         int8_t note;
         Grain grains[MAX_GRAINS_PER_VOICE];
     } voices[MAX_GRAIN_VOICES];
-    
 
     uint8_t baseNote = 110;
     float getSampleStep(uint8_t note)
@@ -61,11 +58,11 @@ protected:
         grain.delay = delay ? ((rand() % delay) * SAMPLE_RATE * 0.001f) : 0;
     }
 
-    float sample(uint8_t voice)
+    float sample(Voice& voice)
     {
         float sample = 0.0f;
         for (uint8_t d = 0; d < density; d++) {
-            Grain& grain = voices[voice].grains[d];
+            Grain& grain = voice.grains[d];
             if (grain.delay > 0) {
                 grain.delay--;
             } else {
@@ -106,6 +103,7 @@ public:
         // open("samples/0_ir0nwave.wav");
         // open("samples/kick.wav");
 
+        allOff();
         setGrainSize(grainSize);
         setAttack(attack);
         setRelease(release);
@@ -244,8 +242,9 @@ public:
             buf[i] = 0;
         }
 
-        for (uint8_t voice = 0; voice < MAX_GRAIN_VOICES; voice++) {
-            if (notesOn[voice] != -1) {
+        for (uint8_t v = 0; v < MAX_GRAIN_VOICES; v++) {
+            Voice& voice = voices[v];
+            if (voice.note != -1) {
                 for (i = 0; i < len; i++) {
                     buf[i] += sample(voice);
                 }
@@ -259,12 +258,13 @@ public:
 
     AudioGranular& noteOn(uint8_t note, uint8_t velocity)
     {
-        for (uint8_t voice = 0; voice < MAX_GRAIN_VOICES; voice++) {
-            if (notesOn[voice] == -1) {
-                notesOn[voice] = note;
+        for (uint8_t v = 0; v < MAX_GRAIN_VOICES; v++) {
+            Voice& voice = voices[v];
+            if (voice.note == -1) {
+                voice.note = note;
                 float sampleStep = getSampleStep(note);
-                for (uint8_t d = 0; d < density; d++) {
-                    initGrain(voices[voice].grains[d], sampleStep);
+                for (uint8_t g = 0; g < density; g++) {
+                    initGrain(voice.grains[g], sampleStep);
                 }
                 printf("noteOn: %d %d %f\n", note, velocity, sampleStep);
                 return *this;
@@ -279,9 +279,10 @@ public:
 
     AudioGranular& noteOff(uint8_t note, uint8_t velocity)
     {
-        for (uint8_t voice = 0; voice < MAX_GRAIN_VOICES; voice++) {
-            if (notesOn[voice] == note) {
-                notesOn[voice] = -1;
+        for (uint8_t v = 0; v < MAX_GRAIN_VOICES; v++) {
+            Voice& voice = voices[v];
+            if (voice.note == note) {
+                voice.note = -1;
                 printf("noteOff set on to false: %d %d\n", note, velocity);
                 return *this;
             }
@@ -293,8 +294,8 @@ public:
 
     AudioGranular& allOff()
     {
-        for (uint8_t voice = 0; voice < MAX_GRAIN_VOICES; voice++) {
-            notesOn[voice] = -1;
+        for (uint8_t v = 0; v < MAX_GRAIN_VOICES; v++) {
+            voices[v].note = -1;
         }
         return *this;
     }
