@@ -19,6 +19,8 @@ protected:
     int64_t grainSampleCount = 0;
     float buffer[AUDIO_BUFFER_SIZE];
     int8_t notesOn[MAX_GRAIN_VOICES] = { -1, -1, -1, -1 };
+    float attackStep = 0.0f;
+    float releaseStep = 0.0f;
 
     struct Grain {
         float pos;
@@ -26,6 +28,12 @@ protected:
         int64_t delay;
         float sampleStep;
     } grains[MAX_GRAIN_VOICES][MAX_GRAINS_PER_VOICE];
+
+    struct Voice
+    {
+        int8_t note;
+    } voices[MAX_GRAIN_VOICES];
+    
 
     uint8_t baseNote = 110;
     float getSampleStep(uint8_t note)
@@ -82,6 +90,8 @@ public:
     uint16_t spray = 1000;
     uint16_t delay = 0;
     uint16_t start = 0;
+    float attack = 0.3f;
+    float release = 1.0f;
 
     AudioGranular()
     {
@@ -96,6 +106,8 @@ public:
         // open("samples/kick.wav");
 
         setGrainSize(grainSize);
+        setAttack(attack);
+        setRelease(release);
     }
 
     ~AudioGranular()
@@ -170,6 +182,36 @@ public:
         return *this;
     }
 
+    /**
+     * @brief Set the Attack time of the voice
+     *
+     * @param attack in ms
+     * @return AudioGranular&
+     */
+    AudioGranular& setAttack(int32_t _attack)
+    {
+        attack = range(_attack, 0, 5000);
+        uint64_t attackSamples = attack * SAMPLE_RATE * 0.001f;
+        attackStep = 1.0f / attackSamples;
+        printf("attack %f ms %ld samples\n", attack, attackSamples);
+        return *this;
+    }
+
+    /**
+     * @brief Set the Release time of the voice
+     *
+     * @param release in ms
+     * @return AudioGranular&
+     */
+    AudioGranular& setRelease(int32_t _release)
+    {
+        release = range(_release, 0, 10000);
+        uint64_t releaseSamples = release * SAMPLE_RATE * 0.001f;
+        releaseStep = 1.0f / releaseSamples;
+        printf("release %f ms %ld samples\n", release, releaseSamples);
+        return *this;
+    }
+
     AudioGranular& close()
     {
         if (file) {
@@ -211,6 +253,8 @@ public:
 
         return i;
     }
+
+    // TODO envelop on noteon and noteoff
 
     AudioGranular& noteOn(uint8_t note, uint8_t velocity)
     {
