@@ -29,11 +29,12 @@ protected:
     };
 
     struct Voice {
-        int8_t note;
+        int8_t note = -1;
         Grain grains[MAX_GRAINS_PER_VOICE];
+        float (AudioGranular::*envelop)() = &AudioGranular::envelopSustain;
     } voices[MAX_GRAIN_VOICES];
 
-    uint8_t baseNote = 110;
+    uint8_t baseNote = 60;
     float getSampleStep(uint8_t note)
     {
         // https://gist.github.com/YuxiUx/ef84328d95b10d0fcbf537de77b936cd
@@ -58,9 +59,15 @@ protected:
         grain.delay = delay ? ((rand() % delay) * SAMPLE_RATE * 0.001f) : 0;
     }
 
+    float envelopSustain()
+    {
+        return 1.0;
+    }
+
     float sample(Voice& voice)
     {
         float sample = 0.0f;
+        float env = (this->*voice.envelop)();
         for (uint8_t d = 0; d < density; d++) {
             Grain& grain = voice.grains[d];
             if (grain.delay > 0) {
@@ -70,7 +77,7 @@ protected:
                 // if (samplePos < sfinfo.frames && (int64_t)grain.pos < grainSampleCount) { // is samplePos < sfinfo.frames even necessary if start calculated properly
                 if ((int64_t)grain.pos < grainSampleCount) {
                     grain.pos += grain.sampleStep;
-                    sample += buffer[samplePos];
+                    sample += buffer[samplePos] * env;
                 } else {
                     initGrain(grain);
                 }
@@ -103,7 +110,7 @@ public:
         // open("samples/0_ir0nwave.wav");
         // open("samples/kick.wav");
 
-        allOff();
+        // allOff();
         setGrainSize(grainSize);
         setAttack(attack);
         setRelease(release);
