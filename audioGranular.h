@@ -27,11 +27,12 @@ protected:
         int64_t start;
         int64_t delay;
         float sampleStep;
-    } grains[MAX_GRAIN_VOICES][MAX_GRAINS_PER_VOICE];
+    };
 
     struct Voice
     {
         int8_t note;
+        Grain grains[MAX_GRAINS_PER_VOICE];
     } voices[MAX_GRAIN_VOICES];
     
 
@@ -64,7 +65,7 @@ protected:
     {
         float sample = 0.0f;
         for (uint8_t d = 0; d < density; d++) {
-            Grain& grain = grains[voice][d];
+            Grain& grain = voices[voice].grains[d];
             if (grain.delay > 0) {
                 grain.delay--;
             } else {
@@ -263,7 +264,7 @@ public:
                 notesOn[voice] = note;
                 float sampleStep = getSampleStep(note);
                 for (uint8_t d = 0; d < density; d++) {
-                    initGrain(grains[voice][d], sampleStep);
+                    initGrain(voices[voice].grains[d], sampleStep);
                 }
                 printf("noteOn: %d %d %f\n", note, velocity, sampleStep);
                 return *this;
