@@ -13,6 +13,7 @@ using namespace std;
 #define AUDIO_BUFFER_SIZE SAMPLE_RATE* AUDIO_BUFFER_SECONDS
 #define MAX_GRAINS_PER_VOICE 24
 #define MAX_GRAIN_VOICES 4
+#define START_POINTS 8
 
 class AudioGranular {
 protected:
@@ -53,12 +54,27 @@ protected:
         initGrain(grain, grain.sampleStep);
     }
 
+    uint16_t getStart()
+    {
+        // TODO should getStart as well return -1, so if none is active
+        // there should be no grain playing
+        uint16_t position = 0;
+        uint8_t randomStart = rand() % START_POINTS;
+        for (uint8_t s = 0; s < randomStart; s++) {
+            if (starts[s].active) {
+                position = starts[s].position;
+            }
+        }
+        return position;
+    }
+
     void initGrain(Grain& grain, float sampleStep)
     {
         grain.sampleStep = sampleStep;
         grain.pos = 0.0f;
+        // TODO spray doesnt need to be negative anymore
         uint16_t _spray = spray ? ((spray - (rand() % (spray * 2))) * SAMPLE_RATE * 0.001f) : 0;
-        grain.start = range(start + _spray, 0, sfinfo.frames);
+        grain.start = range(getStart() + _spray, 0, sfinfo.frames);
         grain.delay = delay ? ((rand() % delay) * SAMPLE_RATE * 0.001f) : 0;
     }
 
@@ -142,6 +158,16 @@ protected:
         return voices[voiceToSteal];
     }
 
+    void initStartPositions()
+    {
+        float startStep = sfinfo.frames / START_POINTS;
+        for (uint8_t s = 0; s < START_POINTS; s++) {
+            starts[s].position = startStep * s;
+            starts[s].active = false;
+        }
+        starts[0].active = true;
+    }
+
 public:
     SF_INFO sfinfo;
     SNDFILE* file = NULL;
@@ -153,6 +179,11 @@ public:
     uint16_t start = 0;
     uint16_t attack = 300;
     uint16_t release = 1000;
+
+    struct Start {
+        uint16_t position = 0;
+        bool active = false;
+    } starts[START_POINTS];
 
     AudioGranular()
     {
@@ -177,6 +208,10 @@ public:
         close();
     }
 
+    // 0 to 40 where 40 is 100% of the sample.
+    // should this mean from grain start till end of the sample?
+    // or should this mean from start of sample till end of the sample?
+
     /**
      * @brief Set the Grain Size meaning the length duration of the grain in ms.
      *
@@ -190,6 +225,9 @@ public:
         printf("grainSampleCount %ld grainSize %d ms\n", grainSampleCount, grainSize);
         return *this;
     }
+
+    // Set spray 0 to 40 where 40 is 100% of the sample area.
+    // Sample is divided in 8 areas (total sample size / 8)
 
     /**
      * @brief Set the Spray of the grain start position, giving +/- ms random position to
@@ -205,6 +243,7 @@ public:
         return *this;
     }
 
+    // 1 to 24
     /**
      * @brief Set the Density meaning the number of grains that are played at the same time.
      *
@@ -217,6 +256,8 @@ public:
         printf("density %d\n", density);
         return *this;
     }
+
+    // delay 0 to 40 (or 80, or 120) for ??????
 
     /**
      * @brief Set the Delay before grain start to play
@@ -231,6 +272,7 @@ public:
         return *this;
     }
 
+    // This is done with the 8 pad
     /**
      * @brief Set the Start position of the sample to play
      *
@@ -293,6 +335,8 @@ public:
         printf("Audio file %s sampleCount %ld sampleRate %d\n", filename, (long)sfinfo.frames, sfinfo.samplerate);
 
         sf_read_float(file, buffer, AUDIO_BUFFER_SIZE);
+
+        initStartPositions();
 
         return *this;
     }
