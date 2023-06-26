@@ -16,6 +16,7 @@ using namespace std;
 
 class AudioGranular {
 protected:
+    uint64_t voicePosition = 0;
     int64_t grainSampleCount = 0;
     float buffer[AUDIO_BUFFER_SIZE];
     float attackStep = 0.0f;
@@ -33,6 +34,7 @@ protected:
         Grain grains[MAX_GRAINS_PER_VOICE];
         float (AudioGranular::*envelop)(Voice& voice) = &AudioGranular::envelopSustain;
         float env = 0.0f;
+        uint64_t position = 0;
     } voices[MAX_GRAIN_VOICES];
 
     uint8_t baseNote = 60;
@@ -111,6 +113,33 @@ protected:
             }
         }
         return sample;
+    }
+
+    Voice& getNextVoice(uint8_t note)
+    {
+        // First, we should look if the voice is not already running, due to the envelopRelease
+        for (uint8_t v = 0; v < MAX_GRAIN_VOICES; v++) {
+            Voice& voice = voices[v];
+            if (voice.note == note) {
+                printf("getNextVoice: voice already running %d\n", note);
+                return voice;
+            }
+        }
+
+        // Else, we should look for a free voice
+        uint8_t voiceToSteal = 0;
+        for (uint8_t v = 0; v < MAX_GRAIN_VOICES; v++) {
+            Voice& voice = voices[v];
+            if (voice.note == -1) {
+                return voice;
+            }
+            if (voice.position < voices[voiceToSteal].position) {
+                voiceToSteal = v;
+            }
+        }
+
+        printf("getNextVoice: no voice available. Steal voice %d.\n", voiceToSteal);
+        return voices[voiceToSteal];
     }
 
 public:
@@ -288,28 +317,17 @@ public:
         return i;
     }
 
-    // TODO envelop on noteon and noteoff
-
     AudioGranular& noteOn(uint8_t note, uint8_t velocity)
     {
-        for (uint8_t v = 0; v < MAX_GRAIN_VOICES; v++) {
-            Voice& voice = voices[v];
-            if (voice.note == -1) {
-                voice.note = note;
-                voice.envelop = &AudioGranular::envelopAttack;
-                // voice.envelop = &AudioGranular::envelopSustain;
-                // voice.env = 1.0f;
-                float sampleStep = getSampleStep(note);
-                for (uint8_t g = 0; g < density; g++) {
-                    initGrain(voice.grains[g], sampleStep);
-                }
-                printf("noteOn: %d %d %f\n", note, velocity, sampleStep);
-                return *this;
-            }
+        Voice& voice = getNextVoice(note);
+        voice.position = voicePosition++;
+        voice.note = note;
+        voice.envelop = &AudioGranular::envelopAttack;
+        float sampleStep = getSampleStep(note);
+        for (uint8_t g = 0; g < density; g++) {
+            initGrain(voice.grains[g], sampleStep);
         }
-
-        // TODO voice stealing
-        printf("noteOn: no voice available. Need to implement voice stealing...\n");
+        printf("noteOn: %d %d %f\n", note, velocity, sampleStep);
 
         return *this;
     }
@@ -319,8 +337,6 @@ public:
         for (uint8_t v = 0; v < MAX_GRAIN_VOICES; v++) {
             Voice& voice = voices[v];
             if (voice.note == note) {
-                // TODO really implement voice stealing
-                // voice.note = -1; 
                 voice.envelop = &AudioGranular::envelopRelease;
                 printf("noteOff set on to false: %d %d\n", note, velocity);
                 return *this;
@@ -336,6 +352,13 @@ public:
         for (uint8_t v = 0; v < MAX_GRAIN_VOICES; v++) {
             voices[v].note = -1;
         }
+        voicePosition = 0;
+
+        // or should we instead do?
+        // for (uint8_t v = 0; v < MAX_GRAIN_VOICES; v++) {
+        //     Voice& voice = voices[v];
+        //     voice.envelop = &AudioGranular::envelopRelease;
+        // }
         return *this;
     }
 };
