@@ -176,7 +176,6 @@ public:
     uint16_t grainSize = 300;
     uint16_t spray = 1000;
     uint16_t delay = 0;
-    uint16_t start = 0;
     uint16_t attack = 300;
     uint16_t release = 1000;
 
@@ -272,19 +271,19 @@ public:
         return *this;
     }
 
-    // This is done with the 8 pad
-    /**
-     * @brief Set the Start position of the sample to play
-     *
-     * @param start in ms
-     * @return AudioGranular&
-     */
-    AudioGranular& setStart(int32_t _start)
-    {
-        start = range(_start, 0, 30000); // should it be between 0 and 1000?
-        printf("start %d ms\n", start);
-        return *this;
-    }
+    // // This is done with the 8 pad
+    // /**
+    //  * @brief Set the Start position of the sample to play
+    //  *
+    //  * @param start in ms
+    //  * @return AudioGranular&
+    //  */
+    // AudioGranular& setStart(int32_t _start)
+    // {
+    //     start = range(_start, 0, 30000); // should it be between 0 and 1000?
+    //     printf("start %d ms\n", start);
+    //     return *this;
+    // }
 
     /**
      * @brief Set the Attack time of the voice
