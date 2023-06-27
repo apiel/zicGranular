@@ -102,20 +102,24 @@ void midiKeyboardCallback(double deltatime, std::vector<unsigned char>* message,
 
 void midiControllerCallback(double deltatime, std::vector<unsigned char>* message, void* userData)
 {
-    // if (message->at(0) == 0x90) {
-    //     onMidiNoteOn(message->at(1), message->at(2));
-    // } else if (message->at(0) == 0x80) {
-    //     onMidiNoteOff(message->at(1), message->at(2));
-    // } else if (message->at(0) == 0xB0) {
-    //     onMidiControlChange(message->at(1), message->at(2));
-    // } else {
-    printf("Midi controller message: ");
-    unsigned int nBytes = message->size();
-    for (unsigned int i = 0; i < nBytes; i++) {
-        printf("%02x ", (int)message->at(i));
+    if (message->at(0) == 0x90) {
+        if (message->at(1) >= 0x20 && message->at(1) <= 0x27) {
+            AudioHandler::get().audioGranular.toggleStart(message->at(1) - 0x20);
+        }
+
+
+        // } else if (message->at(0) == 0x80) {
+        //     onMidiNoteOff(message->at(1), message->at(2));
+        // } else if (message->at(0) == 0xB0) {
+        //     onMidiControlChange(message->at(1), message->at(2));
+    } else {
+        printf("Midi controller message: ");
+        unsigned int nBytes = message->size();
+        for (unsigned int i = 0; i < nBytes; i++) {
+            printf("%02x ", (int)message->at(i));
+        }
+        printf("\n");
     }
-    printf("\n");
-    // }
 }
 
 bool loadMidiInput(RtMidiIn& midi, const char* portName, RtMidiIn::RtMidiCallback callback)

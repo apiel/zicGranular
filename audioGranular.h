@@ -273,19 +273,20 @@ public:
         return *this;
     }
 
-    // // This is done with the 8 pad
-    // /**
-    //  * @brief Set the Start position of the sample to play
-    //  *
-    //  * @param start in ms
-    //  * @return AudioGranular&
-    //  */
-    // AudioGranular& setStart(int32_t _start)
-    // {
-    //     start = range(_start, 0, 30000); // should it be between 0 and 1000?
-    //     printf("start %d ms\n", start);
-    //     return *this;
-    // }
+    /**
+     * @brief Toggle the Start position of the sample to play
+     *
+     * @param index of the start position
+     * @return AudioGranular&
+     */
+    AudioGranular& toggleStart(uint8_t index)
+    {
+        if (index < START_POINTS) {
+            starts[index].active = !starts[index].active;
+            printf("toggleStart %d %d\n", index, starts[index].active);
+        }
+        return *this;
+    }
 
     /**
      * @brief Set the Attack time of the voice
