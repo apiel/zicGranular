@@ -16,6 +16,12 @@ using namespace std;
 #define START_POINTS 8
 
 class AudioGranular {
+public:
+    struct Start {
+        uint16_t position = 0;
+        bool active = false;
+    } starts[START_POINTS];
+
 protected:
     uint64_t voicePosition = 0;
     int64_t grainSampleCount = 0;
@@ -54,28 +60,29 @@ protected:
         initGrain(grain, grain.sampleStep);
     }
 
-    uint16_t getStart()
+    Start* getStart()
     {
-        // TODO should getStart as well return -1, so if none is active
-        // there should be no grain playing
-        uint16_t position = 0;
+        Start* start = NULL;
         uint8_t randomStart = rand() % START_POINTS;
         for (uint8_t s = 0; s < randomStart; s++) {
             if (starts[s].active) {
-                position = starts[s].position;
+                start = &starts[s];
             }
         }
-        return position;
+        return start;
     }
 
     void initGrain(Grain& grain, float sampleStep)
     {
-        grain.sampleStep = sampleStep;
-        grain.pos = 0.0f;
-        // TODO spray doesnt need to be negative anymore
-        uint16_t _spray = spray ? ((spray - (rand() % (spray * 2))) * SAMPLE_RATE * 0.001f) : 0;
-        grain.start = range(getStart() + _spray, 0, sfinfo.frames);
-        grain.delay = delay ? ((rand() % delay) * SAMPLE_RATE * 0.001f) : 0;
+        Start* start = getStart();
+        if (start) {
+            grain.sampleStep = sampleStep;
+            grain.pos = 0.0f;
+            // TODO spray doesnt need to be negative anymore
+            uint16_t _spray = spray ? ((spray - (rand() % (spray * 2))) * SAMPLE_RATE * 0.001f) : 0;
+            grain.start = range(start->position + _spray, 0, sfinfo.frames);
+            grain.delay = delay ? ((rand() % delay) * SAMPLE_RATE * 0.001f) : 0;
+        }
     }
 
     float envelopAttack(Voice& voice)
@@ -178,11 +185,6 @@ public:
     uint16_t delay = 0;
     uint16_t attack = 300;
     uint16_t release = 1000;
-
-    struct Start {
-        uint16_t position = 0;
-        bool active = false;
-    } starts[START_POINTS];
 
     AudioGranular()
     {
