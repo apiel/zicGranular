@@ -1,10 +1,10 @@
 #ifndef _MIDI_CONTROLLER_H_
 #define _MIDI_CONTROLLER_H_
 
-#include "audioHandler.h"
 #include "audioGranular.h"
-#include "midiControllerDef.h"
+#include "audioHandler.h"
 #include "def.h"
+#include "midiControllerDef.h"
 
 void sendPad(int pad, int color, int mode)
 {
@@ -19,7 +19,15 @@ void midiControllerRenderGrainStart()
 {
     AudioGranular& audioGranular = AudioHandler::get().audioGranular;
     for (int i = 0; i < START_POINTS; i++) {
-        sendPad(padMatrixFlat[0] + i, audioGranular.starts[i].active ? 0x3C : 0x3E, padMode::On100pct);
+        sendPad(padMatrix[0][0] + i, padColor::Blue, audioGranular.starts[i].active ? padMode::On100pct : padMode::On10pct);
+    }
+
+    // Temporary
+    for (int i = 0; i < START_POINTS; i++) {
+        sendPad(padMatrix[1][0] + i, padColor::Pink, padMode::On10pct);
+        sendPad(padMatrix[2][0] + i, padColor::Yellow, padMode::On10pct);
+        sendPad(padMatrix[3][0] + i, padColor::Green, padMode::On10pct);
+        sendPad(padMatrix[4][0] + i, padColor::Orange, padMode::On10pct);
     }
 }
 
@@ -30,7 +38,6 @@ void midiControllerCallback(double deltatime, std::vector<unsigned char>* messag
             AudioHandler::get().audioGranular.toggleStart(message->at(1) - 0x20);
             midiControllerRenderGrainStart();
         }
-
 
         // } else if (message->at(0) == 0x80) {
         //     onMidiNoteOff(message->at(1), message->at(2));
