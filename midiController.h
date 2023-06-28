@@ -27,7 +27,7 @@ void sendPad(int pad, int mode)
 void midiControlerRenderSelector()
 {
     sendPad(pad::ClipStop, padMode::_On);
-    sendPad(pad::Solo, padMode::_Blink);
+    // sendPad(pad::Solo, padMode::_Blink);
 }
 
 void midiControllerRenderGrainStart()
