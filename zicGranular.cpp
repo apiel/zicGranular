@@ -14,7 +14,7 @@ int main(int argc, char* args[])
         return 0;
     }
 
-    if (loadMidiInput() == false) {
+    if (loadMidi() == false) {
         return 1;
     }
 

@@ -77,6 +77,7 @@
 
 RtMidiIn midiKeyboard;
 RtMidiIn midiController;
+RtMidiOut midiControllerOut;
 RtAudio audio;
 
 float midiFreq[128] = {
