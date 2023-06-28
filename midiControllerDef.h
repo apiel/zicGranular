@@ -24,7 +24,7 @@ uint8_t padMatrixFlat[PAD_MATRIX_ROWS * PAD_MATRIX_COLS] = {
 };
 // clang-format on
 
-enum padMode {
+enum padMatrixMode {
     Off = 0x00,
     On10pct = 0x90,
     On25pct = 0x91,
@@ -43,6 +43,20 @@ enum padMode {
     Blinking1_4 = 0x9e,
     Blinking1_2 = 0x9f,
 };
+
+enum padMatrixColor {
+    Blue = 78,
+    Pink = 95,
+    Yellow = 96,
+    Green = 73,
+    Orange = 84,
+    Red = 5,
+    Purple = 50,
+    Cyan = 102,
+    PastelPink = 4,
+    LightBlue = 32,
+};
+
 
 enum pad {
     Up = 0x40,
@@ -64,17 +78,10 @@ enum pad {
     Shift = 0x62,
 };
 
-enum padColor {
-    Blue = 78,
-    Pink = 95,
-    Yellow = 96,
-    Green = 73,
-    Orange = 84,
-    Red = 5,
-    Purple = 50,
-    Cyan = 102,
-    PastelPink = 4,
-    LightBlue = 32,
+enum padMode {
+    _Off = 0x00,
+    _On = 0x01,
+    _Blink = 0x02,
 };
 
 enum encoder {

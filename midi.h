@@ -46,7 +46,7 @@ bool loadMidi()
         && loadMidiInput(midiKeyboard, "APC Key 25 mk2 K", &midiKeyboardCallback);
 
     if (success) {
-        midiControllerRenderGrainStart();
+        midiControllerRender();
     }
 
     return success;
