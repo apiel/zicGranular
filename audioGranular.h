@@ -79,7 +79,7 @@ protected:
             grain.sampleStep = sampleStep;
             grain.pos = 0.0f;
             // TODO spray doesnt need to be negative anymore
-            uint16_t _spray = spray ? ((spray - (rand() % (spray * 2))) * SAMPLE_RATE * 0.001f) : 0;
+            uint16_t _spray = spray ? ((rand() % spray) * SAMPLE_RATE * 0.001f) : 0;
             grain.start = range(start->position + _spray, 0, sfinfo.frames);
             grain.delay = delay ? ((rand() % delay) * SAMPLE_RATE * 0.001f) : 0;
         }
