@@ -190,13 +190,7 @@ public:
     {
         memset(&sfinfo, 0, sizeof(sfinfo));
 
-        // open("samples/0_squeak.wav");
-        // open("samples/0_altaopa.wav");
         open("samples/0_axxe13.wav");
-        // open("samples/bass03.wav");
-        // open("samples/0_squeaky.wav");
-        // open("samples/0_ir0nwave.wav");
-        // open("samples/kick.wav");
 
         // allOff();
         setGrainSize(grainSize);
