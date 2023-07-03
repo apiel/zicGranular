@@ -1,10 +1,11 @@
 #ifndef _AUDIO_HANDLER_H_
 #define _AUDIO_HANDLER_H_
 
+#include "audioGranular.h"
 #include "def.h"
+#include "fileBrowser.h"
 #include "master.h"
 #include "tempo.h"
-#include "audioGranular.h"
 
 class AudioHandler {
 protected:
@@ -12,11 +13,15 @@ protected:
 
     static AudioHandler* instance;
 
-    AudioHandler() { }
+    AudioHandler()
+    {     
+        audioGranular.open(fileBrowser.getFile(0));
+    }
 
 public:
     Tempo& tempo = Tempo::get();
     AudioGranular audioGranular;
+    FileBrowser fileBrowser = FileBrowser("./samples");
 
     uint8_t stepCounter = 0;
 
