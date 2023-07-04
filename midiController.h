@@ -4,7 +4,15 @@
 #include "audioGranular.h"
 #include "audioHandler.h"
 #include "def.h"
+#include "fileBrowser.h"
 #include "midiControllerDef.h"
+
+enum MidiControllerMode {
+    GRAIN_START_SELECTOR,
+    SAMPLE_SELCETOR,
+};
+
+uint8_t midiControllerMode = MidiControllerMode::GRAIN_START_SELECTOR;
 
 void sendPadMatrix(int pad, int color, int mode)
 {
@@ -46,24 +54,67 @@ void midiControllerRenderGrainStart()
     }
 }
 
+void midiControllerSampleSelector()
+{
+    FileBrowser& fileBrowser = AudioHandler::get().fileBrowser;
+    for (uint8_t i = 0; i < padMatrixLen; i++) {
+        sendPadMatrix(padMatrixFlat[i], padMatrixColor::Blue,
+            fileBrowser.position == i ? padMatrixMode::On100pct : padMatrixMode::On10pct);
+    }
+}
+
 void midiControllerRender()
 {
     midiControlerRenderSelector();
-    midiControllerRenderGrainStart();
+    switch (midiControllerMode) {
+    case MidiControllerMode::GRAIN_START_SELECTOR:
+        midiControllerRenderGrainStart();
+        break;
+    case MidiControllerMode::SAMPLE_SELCETOR:
+        midiControllerSampleSelector();
+        break;
+    }
+}
+
+void midiControllerRender(uint8_t mode)
+{
+    midiControllerMode = mode;
+    midiControllerRender();
 }
 
 void midiControllerCallback(double deltatime, std::vector<unsigned char>* message, void* userData)
 {
     if (message->at(0) == 0x90) {
+        // TODO support all row of matrix
         if (message->at(1) >= 0x20 && message->at(1) <= 0x27) {
-            AudioHandler::get().audioGranular.toggleStart(message->at(1) - 0x20);
-            midiControllerRenderGrainStart();
-        }
+            switch (midiControllerMode) {
+            case MidiControllerMode::GRAIN_START_SELECTOR:
+                AudioHandler::get().audioGranular.toggleStart(message->at(1) - 0x20);
+                midiControllerRenderGrainStart();
+                break;
+            case MidiControllerMode::SAMPLE_SELCETOR: {
+                char * filepath = AudioHandler::get().fileBrowser.getFile(message->at(1) - 0x20);
+                AudioHandler::get().audioGranular.open(filepath);
+                midiControllerSampleSelector();
+                break;
+            }
+            }
 
-        // } else if (message->at(0) == 0x80) {
-        //     onMidiNoteOff(message->at(1), message->at(2));
-        // } else if (message->at(0) == 0xB0) {
-        //     onMidiControlChange(message->at(1), message->at(2));
+        } else if (message->at(1) == pad::ClipStop) {
+            // here we should select the selector...
+            // and then
+            midiControllerRender(MidiControllerMode::SAMPLE_SELCETOR);
+        } else {
+            printf("midi note on: %d\n", message->at(1));
+        }
+    } else if (message->at(0) == 0x80) {
+        if (message->at(1) == pad::ClipStop) {
+            midiControllerRender(MidiControllerMode::GRAIN_START_SELECTOR);
+        } else {
+            printf("midi note off: %d\n", message->at(1));
+        }
+    } else if (message->at(0) == 0xB0) {
+        printf("midi controller: %d\n", message->at(1));
     } else {
         printf("Midi controller message: ");
         unsigned int nBytes = message->size();
