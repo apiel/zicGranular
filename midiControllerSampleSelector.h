@@ -28,7 +28,7 @@ public:
     {
         FileBrowser& fileBrowser = AudioHandler::get().fileBrowser;
         for (uint8_t i = 0; i < padMatrixLen; i++) {
-            sendPadMatrix(padMatrixFlat[i], padMatrixColor::Blue,
+            sendPadMatrix(i, padMatrixColor::Blue,
                 fileBrowser.position == i ? padMatrixMode::On100pct : padMatrixMode::On10pct);
         }
     }

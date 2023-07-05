@@ -42,7 +42,7 @@ public:
 
     void noteOnMatrix(uint8_t index)
     {
-        AudioHandler::get().audioGranular.toggleStart(index);
+        AudioHandler::get().audioGranular.toggleStart(index % PAD_MATRIX_COLS);
         render();
     }
 };

@@ -34,8 +34,8 @@ void midiControllerCallback(double deltatime, std::vector<unsigned char>* messag
 {
     if (message->at(0) == 0x90) {
         // TODO support all row of matrix
-        if (message->at(1) >= 0x20 && message->at(1) <= 0x27) {
-            midiControllerMode->noteOnMatrix(message->at(1) - 0x20);
+        if (message->at(1) <= 0x27) {
+            midiControllerMode->noteOnMatrix(message->at(1));
         } else if (message->at(1) == pad::ClipStop) {
             // here we should select the selector...
             // and then
