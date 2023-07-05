@@ -26,7 +26,6 @@ public:
 
     void render()
     {
-        printf("MidiControllerGrainStart::render\n");
         AudioGranular& audioGranular = AudioHandler::get().audioGranular;
         for (int i = 0; i < START_POINTS; i++) {
             sendPadMatrix(padMatrix[0][0] + i, padMatrixColor::Blue, audioGranular.starts[i].active ? padMatrixMode::On100pct : padMatrixMode::On10pct);

@@ -39,9 +39,7 @@ void midiControllerCallback(double deltatime, std::vector<unsigned char>* messag
         } else if (message->at(1) == pad::ClipStop) {
             // here we should select the selector...
             // and then
-            printf("should render sample selector\n");
             midiControllerRender(MidiControllerSampleSelector::get());
-            // MidiControllerSampleSelector::get().render();
         } else {
             printf("midi note on: %d\n", message->at(1));
         }
