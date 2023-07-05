@@ -1,6 +1,8 @@
 #ifndef _MIDI_CONTROLLER_H_
 #define _MIDI_CONTROLLER_H_
 
+#include <sys/time.h>
+
 #include "audioGranular.h"
 #include "audioHandler.h"
 #include "def.h"
@@ -30,9 +32,13 @@ void midiControllerRender(MidiControllerInterface& mode)
     midiControllerRender();
 }
 
+bool ccpctShown = false;
+struct timeval midiControllerLastTime = { 0, 0 };
 uint8_t ccpct = 10;
 void midiControllerCcPercentage(uint8_t value)
 {
+    ccpctShown = true;
+    gettimeofday(&midiControllerLastTime, NULL);
     uint8_t pad = value / 3;
     for (uint8_t i = 0; i < padMatrixLen; i++) {
         uint8_t mode = padMatrixMode::On10pct;
@@ -53,6 +59,22 @@ void midiControllerCcPercentage(uint8_t value)
             }
         }
         sendPadMatrix(i, padMatrixColor::Cyan, mode);
+    }
+}
+
+void midiControllerRefresh()
+{
+    if (ccpctShown) {
+        struct timeval now;
+        gettimeofday(&now, NULL);
+        printf("midiControllerRefresh check %ld\n", now.tv_usec - midiControllerLastTime.tv_usec);
+        if (now.tv_usec - midiControllerLastTime.tv_usec > 300000) { // 300ms
+        // if (now.tv_sec - midiControllerLastTime.tv_sec > 1) { // 1sec
+            printf("midiControllerRefresh >>>>>>> render\n");
+            ccpctShown = false;
+            midiControllerLastTime = now;
+            midiControllerRender();
+        }
     }
 }
 
@@ -79,7 +101,7 @@ void midiControllerCallback(double deltatime, std::vector<unsigned char>* messag
         // printf("midi controller cc: %d %d\n", message->at(1), message->at(2));
         int8_t dir = message->at(2) < 64 ? message->at(2) : -(128 - message->at(2));
         ccpct = range((int)ccpct + dir, 0, 120);
-        printf("ccpct: %d dir: %d msg: %d\n", ccpct, dir, message->at(2));
+        // printf("ccpct: %d dir: %d msg: %d\n", ccpct, dir, message->at(2));
         midiControllerCcPercentage(ccpct);
     } else {
         printf("Midi controller message: ");
