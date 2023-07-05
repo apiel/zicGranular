@@ -10,6 +10,8 @@
 #include "midiControllerSampleSelector.h"
 #include "midiControllerInterface.h"
 
+MidiControllerInterface* midiControllerMode = &MidiControllerGrainStart::get();
+
 void midiControlerRenderSelector()
 {
     sendPad(pad::ClipStop, padMode::_On);
@@ -19,19 +21,12 @@ void midiControlerRenderSelector()
 void midiControllerRender()
 {
     midiControlerRenderSelector();
-    switch (midiControllerMode) {
-    case MidiControllerMode::GRAIN_START_SELECTOR:
-        MidiControllerGrainStart::get().render();
-        break;
-    case MidiControllerMode::SAMPLE_SELCETOR:
-        MidiControllerSampleSelector::get().render();
-        break;
-    }
+    midiControllerMode->render();
 }
 
-void midiControllerRender(uint8_t mode)
+void midiControllerRender(MidiControllerInterface& mode)
 {
-    midiControllerMode = mode;
+    midiControllerMode = &mode;
     midiControllerRender();
 }
 
@@ -40,27 +35,19 @@ void midiControllerCallback(double deltatime, std::vector<unsigned char>* messag
     if (message->at(0) == 0x90) {
         // TODO support all row of matrix
         if (message->at(1) >= 0x20 && message->at(1) <= 0x27) {
-            uint8_t index = message->at(1) - 0x20;
-            switch (midiControllerMode) {
-            case MidiControllerMode::GRAIN_START_SELECTOR:
-                MidiControllerGrainStart::get().noteOnMatrix(index);
-                break;
-            case MidiControllerMode::SAMPLE_SELCETOR: {
-                MidiControllerSampleSelector::get().noteOnMatrix(index);
-                break;
-            }
-            }
-
+            midiControllerMode->noteOnMatrix(message->at(1) - 0x20);
         } else if (message->at(1) == pad::ClipStop) {
             // here we should select the selector...
             // and then
-            midiControllerRender(MidiControllerMode::SAMPLE_SELCETOR);
+            printf("should render sample selector\n");
+            midiControllerRender(MidiControllerSampleSelector::get());
+            // MidiControllerSampleSelector::get().render();
         } else {
             printf("midi note on: %d\n", message->at(1));
         }
     } else if (message->at(0) == 0x80) {
         if (message->at(1) == pad::ClipStop) {
-            midiControllerRender(MidiControllerMode::GRAIN_START_SELECTOR);
+            midiControllerRender(MidiControllerGrainStart::get());
         } else {
             printf("midi note off: %d\n", message->at(1));
         }

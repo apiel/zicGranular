@@ -26,6 +26,7 @@ public:
 
     void render()
     {
+        printf("MidiControllerSampleSelector::render\n");
         FileBrowser& fileBrowser = AudioHandler::get().fileBrowser;
         for (uint8_t i = 0; i < padMatrixLen; i++) {
             sendPadMatrix(padMatrixFlat[i], padMatrixColor::Blue,
