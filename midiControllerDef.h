@@ -96,4 +96,29 @@ enum encoder {
     k8 = 0x37,
 };
 
+enum MidiControllerMode {
+    GRAIN_START_SELECTOR,
+    SAMPLE_SELCETOR,
+};
+
+uint8_t midiControllerMode = MidiControllerMode::GRAIN_START_SELECTOR;
+
+void sendPadMatrix(int pad, int color, int mode)
+{
+    std::vector<unsigned char> message;
+    message.push_back(mode);
+    message.push_back(pad);
+    message.push_back(color);
+    midiControllerOut.sendMessage(&message);
+}
+
+void sendPad(int pad, int mode)
+{
+    std::vector<unsigned char> message;
+    message.push_back(0x90);
+    message.push_back(pad);
+    message.push_back(mode);
+    midiControllerOut.sendMessage(&message);
+}
+
 #endif
