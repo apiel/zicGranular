@@ -37,8 +37,8 @@ struct timeval midiControllerLastTime = { 0, 0 };
 uint8_t ccpct = 10;
 void midiControllerCcPercentage(uint8_t value)
 {
-    ccpctShown = true;
     gettimeofday(&midiControllerLastTime, NULL);
+    ccpctShown = true;
     uint8_t pad = value / 3;
     for (uint8_t i = 0; i < padMatrixLen; i++) {
         uint8_t mode = padMatrixMode::On10pct;
@@ -67,10 +67,8 @@ void midiControllerRefresh()
     if (ccpctShown) {
         struct timeval now;
         gettimeofday(&now, NULL);
-        printf("midiControllerRefresh check %ld\n", now.tv_usec - midiControllerLastTime.tv_usec);
-        if (now.tv_usec - midiControllerLastTime.tv_usec > 300000) { // 300ms
-        // if (now.tv_sec - midiControllerLastTime.tv_sec > 1) { // 1sec
-            printf("midiControllerRefresh >>>>>>> render\n");
+        long elapsedMs = (now.tv_sec - midiControllerLastTime.tv_sec) * 1000 + (now.tv_usec - midiControllerLastTime.tv_usec) * 0.001; 
+        if (elapsedMs > 300) {
             ccpctShown = false;
             midiControllerLastTime = now;
             midiControllerRender();
