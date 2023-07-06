@@ -108,9 +108,15 @@ void midiControllerCallback(double deltatime, std::vector<unsigned char>* messag
     } else if (message->at(0) == 0xB0) {
         // printf("midi controller cc: %d %d\n", message->at(1), message->at(2));
         int8_t dir = message->at(2) < 64 ? message->at(2) : -(128 - message->at(2));
-        ccpct = range((int)ccpct + dir, 0, 120);
-        // printf("ccpct: %d dir: %d msg: %d\n", ccpct, dir, message->at(2));
-        midiControllerRenderValue(ccpct);
+        // ccpct = range((int)ccpct + dir, 0, 120);
+        // // printf("ccpct: %d dir: %d msg: %d\n", ccpct, dir, message->at(2));
+        // midiControllerRenderValue(ccpct);
+
+        // TODO grainSize should not exeed sample size
+        // and value rendering should also be base on sample size
+        AudioGranular& granular = AudioHandler::get().audioGranular;
+        granular.setGrainSize(granular.grainSize + (dir * 20));
+        midiControllerRenderValue((float)granular.grainSize / 30000 * 120);
     } else {
         printf("Midi controller message: ");
         unsigned int nBytes = message->size();
