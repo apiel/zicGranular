@@ -30,7 +30,7 @@ int main(int argc, char* args[])
         audio.openStream(&audioParams, NULL, APP_AUDIO_FORMAT, SAMPLE_RATE, &bufferFrames, &audioCallback);
         audio.startStream();
         while (audio.isStreamRunning()) {
-            midiControllerRefresh();
+            midiControllerTriggerRefresh();
             usleep(100000); // 100ms
         }
     } catch (RtAudioError& e) {

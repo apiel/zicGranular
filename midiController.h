@@ -14,6 +14,15 @@
 
 MidiControllerInterface* midiControllerMode = &MidiControllerGrainStart::get();
 
+uint16_t midiControllerRefreshTimeout = 0; // in ms
+struct timeval midiControllerLastRenderTime = { 0, 0 };
+
+void midiControllerSetRefreshTimeout(uint16_t timeout)
+{
+    gettimeofday(&midiControllerLastRenderTime, NULL);
+    midiControllerRefreshTimeout = timeout;
+}
+
 void midiControlerRenderSelector()
 {
     sendPad(pad::ClipStop, padMode::_On);
@@ -32,13 +41,24 @@ void midiControllerRender(MidiControllerInterface& mode)
     midiControllerRender();
 }
 
-bool ccpctShown = false;
-struct timeval midiControllerLastTime = { 0, 0 };
+void midiControllerTriggerRefresh()
+{
+    if (midiControllerRefreshTimeout) {
+        struct timeval now;
+        gettimeofday(&now, NULL);
+        long elapsedMs = (now.tv_sec - midiControllerLastRenderTime.tv_sec) * 1000 + (now.tv_usec - midiControllerLastRenderTime.tv_usec) * 0.001;
+        if (elapsedMs > midiControllerRefreshTimeout) {
+            midiControllerRefreshTimeout = 0;
+            midiControllerLastRenderTime = now;
+            midiControllerRender();
+        }
+    }
+}
+
 uint8_t ccpct = 10;
 void midiControllerCcPercentage(uint8_t value)
 {
-    gettimeofday(&midiControllerLastTime, NULL);
-    ccpctShown = true;
+    midiControllerSetRefreshTimeout(300);
     uint8_t pad = value / 3;
     for (uint8_t i = 0; i < padMatrixLen; i++) {
         uint8_t mode = padMatrixMode::On10pct;
@@ -59,20 +79,6 @@ void midiControllerCcPercentage(uint8_t value)
             }
         }
         sendPadMatrix(i, padMatrixColor::Cyan, mode);
-    }
-}
-
-void midiControllerRefresh()
-{
-    if (ccpctShown) {
-        struct timeval now;
-        gettimeofday(&now, NULL);
-        long elapsedMs = (now.tv_sec - midiControllerLastTime.tv_sec) * 1000 + (now.tv_usec - midiControllerLastTime.tv_usec) * 0.001; 
-        if (elapsedMs > 300) {
-            ccpctShown = false;
-            midiControllerLastTime = now;
-            midiControllerRender();
-        }
     }
 }
 
