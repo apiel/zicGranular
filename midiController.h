@@ -55,8 +55,12 @@ void midiControllerTriggerRefresh()
     }
 }
 
-uint8_t ccpct = 10;
-void midiControllerCcPercentage(uint8_t value)
+/**
+ * @brief Render a value on the pad matrix from 0 to 120
+ * 
+ * @param value 
+ */
+void midiControllerRenderValue(uint8_t value)
 {
     midiControllerSetRefreshTimeout(300);
     uint8_t pad = value / 3;
@@ -65,7 +69,7 @@ void midiControllerCcPercentage(uint8_t value)
         if (i < pad) {
             mode = padMatrixMode::On100pct;
         } else if (i == pad) {
-            uint8_t lastPad = ccpct - (pad * 3);
+            uint8_t lastPad = value - (pad * 3);
             switch (lastPad) {
             case 0:
                 mode = padMatrixMode::On25pct;
@@ -82,10 +86,10 @@ void midiControllerCcPercentage(uint8_t value)
     }
 }
 
+uint8_t ccpct = 10;
 void midiControllerCallback(double deltatime, std::vector<unsigned char>* message, void* userData)
 {
     if (message->at(0) == 0x90) {
-        // TODO support all row of matrix
         if (message->at(1) <= 0x27) {
             midiControllerMode->noteOnMatrix(message->at(1));
         } else if (message->at(1) == pad::ClipStop) {
@@ -106,7 +110,7 @@ void midiControllerCallback(double deltatime, std::vector<unsigned char>* messag
         int8_t dir = message->at(2) < 64 ? message->at(2) : -(128 - message->at(2));
         ccpct = range((int)ccpct + dir, 0, 120);
         // printf("ccpct: %d dir: %d msg: %d\n", ccpct, dir, message->at(2));
-        midiControllerCcPercentage(ccpct);
+        midiControllerRenderValue(ccpct);
     } else {
         printf("Midi controller message: ");
         unsigned int nBytes = message->size();
