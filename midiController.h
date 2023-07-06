@@ -57,12 +57,12 @@ void midiControllerTriggerRefresh()
 
 /**
  * @brief Render a value on the pad matrix from 0 to 120
- * 
- * @param value 
+ *
+ * @param value
  */
 void midiControllerRenderValue(uint8_t value)
 {
-    midiControllerSetRefreshTimeout(300);
+    midiControllerSetRefreshTimeout(500);
     uint8_t pad = value / 3;
     for (uint8_t i = 0; i < padMatrixLen; i++) {
         uint8_t mode = padMatrixMode::On10pct;
@@ -112,11 +112,22 @@ void midiControllerCallback(double deltatime, std::vector<unsigned char>* messag
         // // printf("ccpct: %d dir: %d msg: %d\n", ccpct, dir, message->at(2));
         // midiControllerRenderValue(ccpct);
 
-        // TODO grainSize should not exeed sample size
-        // and value rendering should also be base on sample size
         AudioGranular& granular = AudioHandler::get().audioGranular;
-        granular.setGrainSize(granular.grainSize + (dir * 20));
-        midiControllerRenderValue((float)granular.grainSize / 30000 * 120);
+
+        switch (message->at(1)) {
+        case encoder::k1:
+            // TODO grainSize should not exeed sample size
+            // and value rendering should also be base on sample size
+            granular.setGrainSize(granular.grainSize + (dir * 20));
+            midiControllerRenderValue((float)granular.grainSize / 30000 * 120);
+            break;
+
+        case encoder::k5:
+            granular.setDensity(granular.density + dir);
+            midiControllerRenderValue(granular.density * 3 - 1);
+            break;
+        }
+
     } else {
         printf("Midi controller message: ");
         unsigned int nBytes = message->size();
