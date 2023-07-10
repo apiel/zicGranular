@@ -245,7 +245,7 @@ public:
      * @param density
      * @return AudioGranular&
      */
-    AudioGranular& setDensity(uint8_t _density)
+    AudioGranular& setDensity(int8_t _density)
     {
         density = range(_density, 1, MAX_GRAINS_PER_VOICE);
         printf("density %d\n", density);

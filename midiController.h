@@ -122,9 +122,29 @@ void midiControllerCallback(double deltatime, std::vector<unsigned char>* messag
             midiControllerRenderValue((float)granular.grainSize / 30000 * 120);
             break;
 
+        case encoder::k2:
+            granular.setSpray(granular.spray + (dir * 20));
+            midiControllerRenderValue((float)granular.spray / 30000 * 120);
+            break;
+
+        case encoder::k3:
+            granular.setDelay(granular.delay + (dir * 20));
+            midiControllerRenderValue((float)granular.delay / 30000 * 120);
+            break;
+
         case encoder::k5:
             granular.setDensity(granular.density + dir);
             midiControllerRenderValue(granular.density * 3 - 1);
+            break;
+
+        case encoder::k6:
+            granular.setAttack(granular.attack + (dir * 20));
+            midiControllerRenderValue((float)granular.attack / 5000 * 120);
+            break;
+
+        case encoder::k7:
+            granular.setRelease(granular.release + (dir * 20));
+            midiControllerRenderValue((float)granular.release / 10000 * 120);
             break;
         }
 
