@@ -190,7 +190,7 @@ public:
     {
         memset(&sfinfo, 0, sizeof(sfinfo));
 
-        open("samples/0_axxe13.wav");
+        open("samples/0_0_axxe13.wav");
 
         // allOff();
         setGrainSize(grainSize);
@@ -202,10 +202,6 @@ public:
     {
         close();
     }
-
-    // 0 to 40 where 40 is 100% of the sample.
-    // should this mean from grain start till end of the sample?
-    // or should this mean from start of sample till end of the sample?
 
     /**
      * @brief Set the Grain Size meaning the length duration of the grain in ms.
@@ -220,9 +216,6 @@ public:
         printf("grainSampleCount %ld grainSize %d ms\n", grainSampleCount, grainSize);
         return *this;
     }
-
-    // Set spray 0 to 40 where 40 is 100% of the sample area.
-    // Sample is divided in 8 areas (total sample size / 8)
 
     /**
      * @brief Set the Spray of the grain start position, giving +/- ms random position to

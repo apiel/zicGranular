@@ -18,6 +18,7 @@
 
 #ifndef SAMPLE_RATE
 #define SAMPLE_RATE 44100
+// #define SAMPLE_RATE 48000
 #endif
 
 #ifndef APP_CHANNELS
