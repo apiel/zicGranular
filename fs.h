@@ -74,15 +74,15 @@ bool fileExists(const char* filename)
     return (stat(filename, &buffer) == 0);
 }
 
-static int fileCompare(const void *p, const void *q)
-{
-    const char *l= (const char *)p;
-    const char *r= (const char *)q;
-    int cmp;
+// static int fileCompare(const void *p, const void *q)
+// {
+//     const char *l= (const char *)p;
+//     const char *r= (const char *)q;
+//     int cmp;
 
-    cmp= strcmp (l, r);
-    return cmp;
-}
+//     cmp= strcmp (l, r);
+//     return cmp;
+// }
 
 void copyFile(char* src, char* dst)
 {
@@ -100,6 +100,27 @@ void copyFile(char* src, char* dst)
 
     fclose(srcFile);
     fclose(dstFile);
+}
+
+bool readFileContent(const char* filename, char* content, uint32_t len)
+{
+    FILE* file = fopen(filename, "rb");
+    if (file == NULL) {
+        return false;
+    }
+
+    fseek(file, 0, SEEK_END);
+    long fsize = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    if (fsize > len) {
+        fclose(file);
+        return false;
+    }
+
+    fread(content, fsize, 1, file);
+    fclose(file);
+    return true;
 }
 
 #endif

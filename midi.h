@@ -4,6 +4,7 @@
 #include "def.h"
 #include "midiController.h"
 #include "midiKeyboard.h"
+#include "fs.h"
 
 bool loadMidiInput(RtMidiIn& midi, const char* portName, RtMidiIn::RtMidiCallback callback)
 {
@@ -39,8 +40,19 @@ bool loadMidiOutput(RtMidiOut& midi, const char* portName)
     return false;
 }
 
+
+#define MIDI_CONFIG_FILE "./midi.cfg"
+#define MIDI_CONFIG_LEN 4096
+char midiConfig[MIDI_CONFIG_LEN];
+
 bool loadMidi()
 {
+    if (readFileContent(MIDI_CONFIG_FILE, midiConfig, MIDI_CONFIG_LEN) == false) {
+        printf("Midi config file not found: %s\n", MIDI_CONFIG_FILE);
+        return false;
+    }
+    printf("Midi config file loaded: %s\n%s\n", MIDI_CONFIG_FILE, midiConfig);
+
     bool success = loadMidiInput(midiController, "APC Key 25 mk2 C", &midiControllerCallback)
         && loadMidiOutput(midiControllerOut, "APC Key 25 mk2 C")
         && loadMidiInput(midiKeyboard, "APC Key 25 mk2 K", &midiKeyboardCallback);
