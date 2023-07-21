@@ -2,9 +2,25 @@
 #define _MIDI_H_
 
 #include "def.h"
-#include "midiController.h"
-#include "midiKeyboard.h"
 #include "fs.h"
+
+#define MIDI_CONFIG_FILE "./midi.cfg"
+#define MIDI_CONFIG_LEN 4096
+char midiConfig[MIDI_CONFIG_LEN];
+
+void midiControllerCallback(double deltatime, std::vector<unsigned char>* message, void* userData)
+{
+    if (message->at(0) == 0x90) {
+        printf("midi note on: %d\n", message->at(1));
+    } else {
+        printf("Midi controller message: ");
+        unsigned int nBytes = message->size();
+        for (unsigned int i = 0; i < nBytes; i++) {
+            printf("%02x ", (int)message->at(i));
+        }
+        printf("\n");
+    }
+}
 
 bool loadMidiInput(RtMidiIn& midi, const char* portName, RtMidiIn::RtMidiCallback callback)
 {
@@ -24,27 +40,6 @@ bool loadMidiInput(RtMidiIn& midi, const char* portName, RtMidiIn::RtMidiCallbac
     return false;
 }
 
-bool loadMidiOutput(RtMidiOut& midi, const char* portName)
-{
-    unsigned int portCount = midi.getPortCount();
-
-    for (unsigned int i = 0; i < portCount; i++) {
-        if (midi.getPortName(i).find(portName) != std::string::npos) {
-            midi.openPort(i);
-            printf("Midi output loaded: %s\n", midi.getPortName(i).c_str());
-            return true;
-        }
-    }
-
-    printf("Midi output %s not found\n", portName);
-    return false;
-}
-
-
-#define MIDI_CONFIG_FILE "./midi.cfg"
-#define MIDI_CONFIG_LEN 4096
-char midiConfig[MIDI_CONFIG_LEN];
-
 bool loadMidi()
 {
     if (readFileContent(MIDI_CONFIG_FILE, midiConfig, MIDI_CONFIG_LEN) == false) {
@@ -53,13 +48,14 @@ bool loadMidi()
     }
     printf("Midi config file loaded: %s\n%s\n", MIDI_CONFIG_FILE, midiConfig);
 
-    bool success = loadMidiInput(midiController, "APC Key 25 mk2 C", &midiControllerCallback)
-        && loadMidiOutput(midiControllerOut, "APC Key 25 mk2 C")
-        && loadMidiInput(midiKeyboard, "APC Key 25 mk2 K", &midiKeyboardCallback);
-
-    if (success) {
-        midiControllerRender();
+    // get first line
+    char* midiControllerName = strtok(midiConfig, "\n");
+    if (midiControllerName == NULL) {
+        printf("Midi config file is empty\n");
+        return false;
     }
+
+    bool success = loadMidiInput(midiController, midiControllerName, &midiControllerCallback);
 
     return success;
 }
