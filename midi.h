@@ -5,8 +5,12 @@
 #include "fs.h"
 #include "midiMapping.h"
 
-#define MIDI_CONTROLS 3
-MidiMapping midiMappings[MIDI_CONTROLS];
+#define MIDI_MAPS 3
+MidiMapping midiMappings[MIDI_MAPS] = {
+    MidiMapping("GRAIN_START_POSITION"),
+    MidiMapping("GRAIN_DENSIY"),
+    MidiMapping("GRAIN_SIZE"),
+};
 
 void midiControllerCallback(double deltatime, std::vector<unsigned char>* message, void* userData)
 {
@@ -22,7 +26,7 @@ void midiControllerCallback(double deltatime, std::vector<unsigned char>* messag
         }
         printf("\n");
 
-        for (int i = 0; i < MIDI_CONTROLS; i++) {
+        for (int i = 0; i < MIDI_MAPS; i++) {
             if (midiMappings[i].handle(message)) {
                 break;
             }

@@ -43,13 +43,13 @@ void assignKeyValue(char* key, char* value)
 {
     if (strcmp(key, "MIDIIN") == 0) {
         loadMidiInput(midiController, trimChar(value), &midiControllerCallback);
-    } else if (strcmp(key, "GRAIN_START_POSITION") == 0) {
-        assignMidiMapping(midiMappings[0], value);
-    }  else if (strcmp(key, "GRAIN_DENSIY") == 0) {
-        assignMidiMapping(midiMappings[1], value);
-    }  else if (strcmp(key, "GRAIN_SIZE") == 0) {
-        assignMidiMapping(midiMappings[2], value);
     } else {
+        for (int i = 0; i < MIDI_MAPS; i++) {
+            if (strcmp(key, midiMappings[i].key) == 0) {
+                assignMidiMapping(midiMappings[i], value);
+                return;
+            }
+        }
         printf("unknown config key: %s\n", key);
     }
 }

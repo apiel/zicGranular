@@ -20,11 +20,13 @@ protected:
     }
 
 public:
+    const char* key;
     uint8_t size = 0;
     uint8_t valuePosition = 0;
     uint8_t msg[2] = { 0x00, 0x00 };
 
-    MidiMapping()
+    MidiMapping(const char* _key)
+        : key(_key)
     {
     }
 
