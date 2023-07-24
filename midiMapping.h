@@ -1,9 +1,9 @@
-#ifndef _MIDI_CONFIG_H_
-#define _MIDI_CONFIG_H_
+#ifndef _MIDI_MAPPING_H_
+#define _MIDI_MAPPING_H_
 
 #include "def.h"
 
-class MidiConfig {
+class MidiMapping {
 protected:
     bool isValid(std::vector<unsigned char>* message)
     {
@@ -24,7 +24,7 @@ public:
     uint8_t valuePosition;
     uint8_t msg[2];
 
-    MidiConfig(uint8_t _size, uint8_t _valuePosition, uint8_t _msg1, uint8_t _msg2 = 0x00)
+    MidiMapping(uint8_t _size, uint8_t _valuePosition, uint8_t _msg1, uint8_t _msg2 = 0x00)
         : size(_size)
         , valuePosition(_valuePosition)
         , msg { _msg1, _msg2 }
@@ -34,7 +34,6 @@ public:
     bool handle(std::vector<unsigned char>* message)
     {
         if (isValid(message)) {
-            // calculate percentage
             uint16_t value = 0;
             float pct = 0.0f;
             if (valuePosition == size) {
