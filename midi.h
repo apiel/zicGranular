@@ -55,24 +55,4 @@ bool loadMidiInput(RtMidiIn& midi, const char* portName, RtMidiIn::RtMidiCallbac
     return false;
 }
 
-bool loadMidi()
-{
-    if (readFileContent(MIDI_CONFIG_FILE, midiConfig, MIDI_CONFIG_LEN) == false) {
-        printf("Midi config file not found: %s\n", MIDI_CONFIG_FILE);
-        return false;
-    }
-    printf("Midi config file loaded: %s\n%s\n", MIDI_CONFIG_FILE, midiConfig);
-
-    // get first line
-    char* midiControllerName = strtok(midiConfig, "\n");
-    if (midiControllerName == NULL) {
-        printf("Midi config file is empty\n");
-        return false;
-    }
-
-    bool success = loadMidiInput(midiController, midiControllerName, &midiControllerCallback);
-
-    return success;
-}
-
 #endif

@@ -102,25 +102,4 @@ void copyFile(char* src, char* dst)
     fclose(dstFile);
 }
 
-bool readFileContent(const char* filename, char* content, uint32_t len)
-{
-    FILE* file = fopen(filename, "rb");
-    if (file == NULL) {
-        return false;
-    }
-
-    fseek(file, 0, SEEK_END);
-    long fsize = ftell(file);
-    fseek(file, 0, SEEK_SET);
-
-    if (fsize > len) {
-        fclose(file);
-        return false;
-    }
-
-    fread(content, fsize, 1, file);
-    fclose(file);
-    return true;
-}
-
 #endif
