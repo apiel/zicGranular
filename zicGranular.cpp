@@ -1,4 +1,5 @@
 #include "def.h"
+#include "config.h"
 #include "midi.h"
 #include "audio.h"
 
@@ -15,6 +16,10 @@ int main(int argc, char* args[])
     }
 
     if (loadMidi() == false) {
+        return 1;
+    }
+
+    if (loadConfig() == false) {
         return 1;
     }
 
