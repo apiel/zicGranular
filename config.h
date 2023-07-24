@@ -8,13 +8,7 @@
 
 bool loadConfig()
 {
-
-    // loop through lines
-    // for each line, split by '='
-    // if first part matches a config variable, set it
-
-
-    FILE* file = fopen(CONFIG_FILE, "r"); /* should check the result */
+    FILE* file = fopen(CONFIG_FILE, "r");
     if (file == NULL) {
         printf("Failed to load config file: %s\n", CONFIG_FILE);
         return false;
@@ -27,7 +21,14 @@ bool loadConfig()
         if (line[0] == '#' || line[0] == '\n') {
             continue;
         }
-        printf("%s", line); 
+        // split by '='
+        char* key = strtok(line, "=");
+        char* value = strtok(NULL, "=");
+        if (key == NULL || value == NULL) {
+            printf("Invalid config line: %s\n", line);
+            continue;
+        }
+        printf("key: %s, value: %s\n", key, value); 
     }
     fclose(file);
         
