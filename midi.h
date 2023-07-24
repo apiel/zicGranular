@@ -10,10 +10,7 @@
 char midiConfig[MIDI_CONFIG_LEN];
 
 #define MIDI_CONTROLS 2
-MidiMapping midiMappings[MIDI_CONTROLS] = {
-    MidiMapping(3, 2, 0xe0),
-    MidiMapping(2, 2, 0xd0),
-};
+MidiMapping midiMappings[MIDI_CONTROLS];
 
 void midiControllerCallback(double deltatime, std::vector<unsigned char>* message, void* userData)
 {

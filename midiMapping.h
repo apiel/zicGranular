@@ -20,14 +20,11 @@ protected:
     }
 
 public:
-    uint8_t size;
-    uint8_t valuePosition;
-    uint8_t msg[2];
+    uint8_t size = 0;
+    uint8_t valuePosition = 0;
+    uint8_t msg[2] = { 0x00, 0x00 };
 
-    MidiMapping(uint8_t _size, uint8_t _valuePosition, uint8_t _msg1, uint8_t _msg2 = 0x00)
-        : size(_size)
-        , valuePosition(_valuePosition)
-        , msg { _msg1, _msg2 }
+    MidiMapping()
     {
     }
 

@@ -7,7 +7,7 @@
 
 #define CONFIG_FILE "./config.cfg"
 
-char * trimChar(char* str, char c = '\n')
+char* trimChar(char* str, char c = '\n')
 {
     int len = strlen(str);
     for (int i = 0; i < len; i++) {
@@ -19,11 +19,30 @@ char * trimChar(char* str, char c = '\n')
     return str;
 }
 
+void assignMidiMapping(MidiMapping& map, char* value)
+{
+// split value by space
+    char* msg1 = strtok(value, " ");
+    char* msg2 = strtok(NULL, " ");
+    char* msg3 = strtok(NULL, " ");
+
+    if (msg1 == NULL || msg2 == NULL) {
+        printf("Invalid midi mapping\n");
+        return;
+    }
+
+    map.size = msg3 == NULL ? 2 : 3;
+    map.valuePosition = msg2[0] == 'x' && msg2[1] == 'x' ? 2 : 3;
+    map.msg[0] = (uint8_t)strtol(msg1, NULL, 16);
+    map.msg[1] = (uint8_t)strtol(msg2, NULL, 16);
+}
+
 void assignKeyValue(char* key, char* value)
 {
-    // if key = MIDIIN
     if (strcmp(key, "MIDIIN") == 0) {
         loadMidiInput(midiController, trimChar(value), &midiControllerCallback);
+    } else if (strcmp(key, "GRANULAR_START_POSITION") == 0) {
+        assignMidiMapping(midiMappings[0], value);
     } else {
         printf("unknown config key: %s\n", key);
     }
