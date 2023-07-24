@@ -21,7 +21,7 @@ char* trimChar(char* str, char c = '\n')
 
 void assignMidiMapping(MidiMapping& map, char* value)
 {
-// split value by space
+    // split value by space
     char* msg1 = strtok(value, " ");
     char* msg2 = strtok(NULL, " ");
     char* msg3 = strtok(NULL, " ");
@@ -35,14 +35,20 @@ void assignMidiMapping(MidiMapping& map, char* value)
     map.valuePosition = msg2[0] == 'x' && msg2[1] == 'x' ? 2 : 3;
     map.msg[0] = (uint8_t)strtol(msg1, NULL, 16);
     map.msg[1] = (uint8_t)strtol(msg2, NULL, 16);
+
+    printf("Midi mapping: %02x %02x, size: %d valuePosition: %d\n", map.msg[0], map.msg[1], map.size, map.valuePosition);
 }
 
 void assignKeyValue(char* key, char* value)
 {
     if (strcmp(key, "MIDIIN") == 0) {
         loadMidiInput(midiController, trimChar(value), &midiControllerCallback);
-    } else if (strcmp(key, "GRANULAR_START_POSITION") == 0) {
+    } else if (strcmp(key, "GRAIN_START_POSITION") == 0) {
         assignMidiMapping(midiMappings[0], value);
+    }  else if (strcmp(key, "GRAIN_DENSIY") == 0) {
+        assignMidiMapping(midiMappings[1], value);
+    }  else if (strcmp(key, "GRAIN_SIZE") == 0) {
+        assignMidiMapping(midiMappings[2], value);
     } else {
         printf("unknown config key: %s\n", key);
     }

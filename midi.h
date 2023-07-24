@@ -5,11 +5,7 @@
 #include "fs.h"
 #include "midiMapping.h"
 
-#define MIDI_CONFIG_FILE "./midi.cfg"
-#define MIDI_CONFIG_LEN 4096
-char midiConfig[MIDI_CONFIG_LEN];
-
-#define MIDI_CONTROLS 2
+#define MIDI_CONTROLS 3
 MidiMapping midiMappings[MIDI_CONTROLS];
 
 void midiControllerCallback(double deltatime, std::vector<unsigned char>* message, void* userData)
