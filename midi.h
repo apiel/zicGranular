@@ -10,8 +10,18 @@ char midiConfig[MIDI_CONFIG_LEN];
 
 void midiControllerCallback(double deltatime, std::vector<unsigned char>* message, void* userData)
 {
-    if (message->at(0) == 0x90) {
-        printf("midi note on: %d\n", message->at(1));
+    if (message->at(0) == 0xf8) {
+        // ignore midi clock
+    } else if (message->at(0) == 0xfe) {
+        // ignore active sensing
+    } else if (message->at(0) >= 0xe0 && message->at(0) <= 0xef) {
+        // pitch bend
+        if (message->size() == 3) {
+            uint8_t channel = message->at(0) & 0x0f;
+            uint16_t value = (message->at(2) << 7) + message->at(1);
+            float pct = (float)value / 16383.0f;
+            printf("Pitch bend (ch %d): %d / 16383 = %f\n", channel, value, pct);
+        }
     } else {
         printf("Midi controller message: ");
         unsigned int nBytes = message->size();
