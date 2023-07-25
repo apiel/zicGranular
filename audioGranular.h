@@ -352,6 +352,10 @@ public:
 
     AudioGranular& noteOn(uint8_t note, uint8_t velocity)
     {
+        if (velocity == 0) {
+            return noteOff(note, velocity);
+        }
+
         Voice& voice = getNextVoice(note);
         voice.position = voicePosition++;
         voice.note = note;

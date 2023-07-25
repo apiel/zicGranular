@@ -29,11 +29,7 @@ void midiControllerCallback(double deltatime, std::vector<unsigned char>* messag
     } else if (message->at(0) >= 0x90 && message->at(0) < 0xa0) {
         uint8_t channel = message->at(0) - 0x90;
         if (channel == midiSequencerChannel) {
-            if (message->at(2) == 0) {
-                AudioHandler::get().audioGranular.noteOff(message->at(1), 0);
-            } else {
-                AudioHandler::get().audioGranular.noteOn(message->at(1), message->at(2));
-            }
+            AudioHandler::get().audioGranular.noteOn(message->at(1), message->at(2));
         }
     } else if (message->at(0) >= 0x80 && message->at(0) < 0x90) {
         uint8_t channel = message->at(0) - 0x80;
