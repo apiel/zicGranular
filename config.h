@@ -43,6 +43,9 @@ void assignKeyValue(char* key, char* value)
 {
     if (strcmp(key, "MIDIIN") == 0) {
         loadMidiInput(midiController, trimChar(value), &midiControllerCallback);
+    } else if (strcmp(key, "SEQUENCER_CHANNEL") == 0) {
+        midiSequencerChannel = atoi(value);
+        printf("Midi sequencer channell set: %d\n", midiSequencerChannel);
     } else {
         for (int i = 0; i < MIDI_MAPS; i++) {
             if (strcmp(key, midiMappings[i].key) == 0) {

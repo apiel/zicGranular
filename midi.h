@@ -1,6 +1,7 @@
 #ifndef _MIDI_H_
 #define _MIDI_H_
 
+#include "audioHandler.h"
 #include "def.h"
 #include "fs.h"
 #include "midiMapping.h"
@@ -25,6 +26,20 @@ void midiControllerCallback(double deltatime, std::vector<unsigned char>* messag
         // ignore midi clock
     } else if (message->at(0) == 0xfe) {
         // ignore active sensing
+    } else if (message->at(0) >= 0x90 && message->at(0) < 0xa0) {
+        uint8_t channel = message->at(0) - 0x90;
+        if (channel == midiSequencerChannel) {
+            if (message->at(2) == 0) {
+                AudioHandler::get().audioGranular.noteOff(message->at(1), 0);
+            } else {
+                AudioHandler::get().audioGranular.noteOn(message->at(1), message->at(2));
+            }
+        }
+    } else if (message->at(0) >= 0x80 && message->at(0) < 0x90) {
+        uint8_t channel = message->at(0) - 0x80;
+        if (channel == midiSequencerChannel) {
+            AudioHandler::get().audioGranular.noteOff(message->at(1), message->at(2));
+        }
     } else {
         for (int i = 0; i < MIDI_MAPS; i++) {
             if (midiMappings[i].handle(message)) {
