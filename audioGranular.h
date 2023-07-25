@@ -231,16 +231,15 @@ public:
         return *this;
     }
 
-    // 1 to 24
     /**
      * @brief Set the Density meaning the number of grains that are played at the same time.
      *
      * @param density
      * @return AudioGranular&
      */
-    AudioGranular& setDensity(int8_t _density)
+    AudioGranular& setDensity(float _density)
     {
-        density = range(_density, 1, MAX_GRAINS_PER_VOICE);
+        density = _density * (MAX_GRAINS_PER_VOICE - 1) + 1; // 1 to MAX_GRAINS_PER_VOICE
         printf("density %d\n", density);
         return *this;
     }
