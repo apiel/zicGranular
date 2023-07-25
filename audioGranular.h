@@ -237,12 +237,14 @@ public:
     /**
      * @brief Set the Delay before grain start to play
      *
-     * @param delay where 0 is no delay and 1 is 5000ms
+     * @param delay where 0 is no delay and 1 is 1000ms
      * @return AudioGranular&
      */
     AudioGranular& setDelay(float value)
     {
-        delay = range(value, 0.0f, 1.0f) * 5000 * SAMPLE_RATE * 0.001f;
+        // delay = range(value, 0.0f, 1.0f) * SAMPLE_RATE * 0.001f * 1000;
+        // can be simplified to:
+        delay = range(value, 0.0f, 1.0f) * SAMPLE_RATE;
         printf("delay %ld\n", delay);
         return *this;
     }
