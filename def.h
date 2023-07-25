@@ -8,8 +8,12 @@
 #include <string.h>
 #include <unistd.h>
 
-#ifndef APP_LOG
-#define APP_LOG printf
+#ifndef APP_PRINT
+#define APP_PRINT printf
+#endif
+
+#ifndef APP_INFO
+#define APP_INFO APP_PRINT
 #endif
 
 #ifndef APP_SAMPLES_FOLDER
@@ -106,6 +110,7 @@ void setMasterVolume(float volume, float gain = gainOutput)
     masterVolumeWithGain = gainOutput * masterVolume;
 }
 
+bool debugMode = false;
 int noDebug(const char* format, ...)
 {
     return 0;
@@ -114,7 +119,8 @@ int (*debug)(const char* format, ...) = noDebug;
 
 void enableDebug()
 {
-    debug = APP_LOG;
+    debugMode = true;
+    debug = APP_PRINT;
 }
 
 #endif

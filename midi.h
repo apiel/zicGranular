@@ -57,12 +57,14 @@ void midiControllerCallback(double deltatime, std::vector<unsigned char>* messag
                 return;
             }
         }
-        printf("Midi controller message: ");
-        unsigned int nBytes = message->size();
-        for (unsigned int i = 0; i < nBytes; i++) {
-            printf("%02x ", (int)message->at(i));
+        if (debugMode) {
+            debug("Midi controller message: ");
+            unsigned int nBytes = message->size();
+            for (unsigned int i = 0; i < nBytes; i++) {
+                debug("%02x ", (int)message->at(i));
+            }
+            debug("\n");
         }
-        printf("\n");
     }
 }
 
@@ -75,12 +77,12 @@ bool loadMidiInput(RtMidiIn& midi, const char* portName, RtMidiIn::RtMidiCallbac
             midi.openPort(i);
             midi.setCallback(callback);
             midi.ignoreTypes(false, false, false);
-            printf("Midi input loaded: %s\n", midi.getPortName(i).c_str());
+            APP_INFO("Midi input loaded: %s\n", midi.getPortName(i).c_str());
             return true;
         }
     }
 
-    printf("Midi input %s not found\n", portName);
+    APP_INFO("Midi input %s not found\n", portName);
     return false;
 }
 

@@ -306,10 +306,10 @@ public:
         close();
 
         if (!(file = sf_open(filename, SFM_READ, &sfinfo))) {
-            APP_LOG("Error: could not open file %s\n", filename);
+            APP_INFO("Error: could not open file %s\n", filename);
             return *this;
         }
-        APP_LOG("Audio file %s sampleCount %ld sampleRate %d\n", filename, (long)sfinfo.frames, sfinfo.samplerate);
+        APP_INFO("Audio file %s sampleCount %ld sampleRate %d\n", filename, (long)sfinfo.frames, sfinfo.samplerate);
 
         sf_read_float(file, buffer, AUDIO_BUFFER_SIZE);
 

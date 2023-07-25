@@ -264,10 +264,10 @@ public:
             size_t sz;
             void* loaded = SDL_LoadFile(getFilePath(), &sz);
             if (!loaded) {
-                APP_LOG("Error: could not load file %s\n", getFilePath());
+                APP_INFO("Error: could not load file %s\n", getFilePath());
                 return *this;
             }
-            // APP_LOG("Track data (%lu):\n%s\n\n", sz, (char*)loaded);
+            // APP_INFO("Track data (%lu):\n%s\n\n", sz, (char*)loaded);
 
             char* rest = (char*)loaded;
             setAudioFileName(strtok_r(rest, "\n", &rest));
@@ -295,7 +295,7 @@ public:
         if (name[0] != '-') {
             FILE* file = fopen(getFilePath(), "w");
             if (!file) {
-                APP_LOG("Error: could not open file %s\n", getFilePath());
+                APP_INFO("Error: could not open file %s\n", getFilePath());
                 return *this;
             }
             fprintf(file, "%s\n", audioFileName);

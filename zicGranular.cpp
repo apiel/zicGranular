@@ -5,7 +5,7 @@
 int main(int argc, char* args[])
 {
     if (argc < 2) {
-        printf("Usage:\n    %s\n    %s --list\n", args[0], args[0]);
+        APP_PRINT("Usage:\n    %s\n    %s --list\n", args[0], args[0]);
         return 1;
     }
 

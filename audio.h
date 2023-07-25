@@ -17,17 +17,17 @@ void showAudioDeviceInfo()
 {
     unsigned int deviceCount = audio.getDeviceCount();
 
-    printf("Found %d audio devices:\n\n", deviceCount);
+    APP_PRINT("Found %d audio devices:\n\n", deviceCount);
     RtAudio::DeviceInfo rtInfo;
     for (unsigned int i = 0; i < deviceCount; i++) {
         rtInfo = audio.getDeviceInfo(i);
         if (rtInfo.probed == true) {
-            // printf(" (%d) %s", i, rtInfo.name.c_str());
-            // printf("  (chan: %d, sampleRate: %d)\n", rtInfo.outputChannels, rtInfo.preferredSampleRate);
-            printf(" (%d) %s\n", i, rtInfo.name.c_str());
+            // APP_PRINT(" (%d) %s", i, rtInfo.name.c_str());
+            // APP_PRINT("  (chan: %d, sampleRate: %d)\n", rtInfo.outputChannels, rtInfo.preferredSampleRate);
+            APP_PRINT(" (%d) %s\n", i, rtInfo.name.c_str());
         }
     }
-    printf("\n");
+    APP_PRINT("\n");
 }
 
 unsigned int getAudioDeviceId(char * name)
