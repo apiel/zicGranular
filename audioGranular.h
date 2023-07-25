@@ -232,7 +232,19 @@ public:
         return *this;
     }
 
-    // delay 0 to 40 (or 80, or 120) for ??????
+    /**
+     * @brief Set the Start position of the sample to play
+     *
+     * @param _start position from 0.0 to 1.0, where 0.0 is the start of the sample
+     * and 1.0 the end of the sample
+     * @return AudioGranular&
+     */
+    AudioGranular& setStart(float value)
+    {
+        start = range(value, 0.0f, 1.0f);
+        printf("setStart %f\n", start);
+        return *this;
+    }
 
     /**
      * @brief Set the Delay before grain start to play
@@ -250,46 +262,34 @@ public:
     }
 
     /**
-     * @brief Set the Start position of the sample to play
-     *
-     * @param _start position from 0.0 to 1.0, where 0.0 is the start of the sample
-     * and 1.0 the end of the sample
-     * @return AudioGranular&
-     */
-    AudioGranular& setStart(float value)
-    {
-        start = range(value, 0.0f, 1.0f);
-        printf("setStart %f\n", start);
-        return *this;
-    }
-
-    /**
      * @brief Set the Attack time of the voice
      *
-     * @param attack in ms
+     * @param attack where 0 is no attack and 1 is 5000ms
      * @return AudioGranular&
      */
-    AudioGranular& setAttack(int32_t _attack)
+    AudioGranular& setAttack(float value)
     {
-        attack = range(_attack, 0, 5000);
-        uint64_t attackSamples = attack * SAMPLE_RATE * 0.001f;
+        // uint64_t attackSamples = range(value, 0.0f, 1.0f) * SAMPLE_RATE * 0.001f * 5000;
+        // can be simplified to:
+        uint64_t attackSamples = range(value, 0.0f, 1.0f) * SAMPLE_RATE * 5;
         attackStep = 1.0f / attackSamples;
-        printf("attack %d ms %ld samples %f step\n", attack, attackSamples, attackStep);
+        printf("attack %ld samples %f step\n", attackSamples, attackStep);
         return *this;
     }
 
     /**
      * @brief Set the Release time of the voice
      *
-     * @param release in ms
+     * @param release where 0 is no release and 1 is 10000ms
      * @return AudioGranular&
      */
-    AudioGranular& setRelease(int32_t _release)
+    AudioGranular& setRelease(float value)
     {
-        release = range(_release, 0, 10000);
-        uint64_t releaseSamples = release * SAMPLE_RATE * 0.001f;
+        // uint64_t releaseSamples = range(value, 0.0f, 1.0f) * SAMPLE_RATE * 0.001f * 10000;
+        // can be simplified to:
+        uint64_t releaseSamples = range(value, 0.0f, 1.0f) * SAMPLE_RATE * 10;
         releaseStep = 1.0f / releaseSamples;
-        printf("release %d ms %ld samples %f step\n", release, releaseSamples, releaseStep);
+        printf("release %ld samples %f step\n", releaseSamples, releaseStep);
         return *this;
     }
 

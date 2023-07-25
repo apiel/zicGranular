@@ -25,6 +25,12 @@ MidiMapping midiMappings[] = {
     MidiMapping("MASTER_VOLUME", [](float value) {
         setMasterVolume(value);
     }),
+    MidiMapping("ENV_ATTACK", [](float value) {
+        AudioHandler::get().audioGranular.setAttack(value);
+    }),
+    MidiMapping("ENV_RELEASE", [](float value) {
+        AudioHandler::get().audioGranular.setRelease(value);
+    }),
 };
 
 const uint8_t MIDI_MAPS = sizeof(midiMappings) / sizeof(midiMappings[0]);
