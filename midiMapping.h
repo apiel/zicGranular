@@ -25,9 +25,9 @@ public:
     uint8_t valuePosition = 0;
     uint8_t msg[2] = { 0x00, 0x00 };
 
-    void (*callback)(uint16_t value, float pct) = NULL;
+    void (*callback)(float value) = NULL;
 
-    MidiMapping(const char* _key, void (*_callback)(uint16_t value, float pct))
+    MidiMapping(const char* _key, void (*_callback)(float value))
         : key(_key)
         , callback(_callback)
     {
@@ -36,16 +36,11 @@ public:
     bool handle(std::vector<unsigned char>* message)
     {
         if (isValid(message)) {
-            uint16_t value = 0;
-            float pct = 0.0f;
             if (valuePosition == size) {
-                value = message->at(valuePosition - 1);
-                pct = (float)value / 127.0f;
+                callback(message->at(valuePosition - 1) / 127.0f);
             } else {
-                value = (message->at(2) << 7) + message->at(1);
-                pct = (float)value / 16383.0f;
+                callback(((message->at(2) << 7) + message->at(1)) / 16383.0f);
             }
-            callback(value, pct);
             return true;
         }
         return false;
