@@ -5,8 +5,7 @@
 #include "fs.h"
 #include "midiMapping.h"
 
-#define MIDI_MAPS 3
-MidiMapping midiMappings[MIDI_MAPS] = {
+MidiMapping midiMappings[] = {
     MidiMapping("GRAIN_START_POSITION", [](float value) {
         printf("GRAIN_START_POSITION value %f\n", value);
     }),
@@ -18,6 +17,8 @@ MidiMapping midiMappings[MIDI_MAPS] = {
     }),
 };
 
+const uint8_t MIDI_MAPS = sizeof(midiMappings) / sizeof(midiMappings[0]);
+
 void midiControllerCallback(double deltatime, std::vector<unsigned char>* message, void* userData)
 {
     if (message->at(0) == 0xf8) {
@@ -25,18 +26,17 @@ void midiControllerCallback(double deltatime, std::vector<unsigned char>* messag
     } else if (message->at(0) == 0xfe) {
         // ignore active sensing
     } else {
+        for (int i = 0; i < MIDI_MAPS; i++) {
+            if (midiMappings[i].handle(message)) {
+                return;
+            }
+        }
         printf("Midi controller message: ");
         unsigned int nBytes = message->size();
         for (unsigned int i = 0; i < nBytes; i++) {
             printf("%02x ", (int)message->at(i));
         }
         printf("\n");
-
-        for (int i = 0; i < MIDI_MAPS; i++) {
-            if (midiMappings[i].handle(message)) {
-                break;
-            }
-        }
     }
 }
 
