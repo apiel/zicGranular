@@ -32,8 +32,13 @@ MidiMapping midiMappings[] = {
         AudioHandler::get().audioGranular.setRelease(value);
     }),
     MidiMapping("SAMPLE_SELECTOR", [](float value) {
-        // AudioHandler::get().audioGranular.setPitch(value);
-        printf("SAMPLE_SELECTOR: %f\n", value);
+        FileBrowser& fileBrowser = AudioHandler::get().fileBrowser;
+        uint8_t position = fileBrowser.count * value;
+        if (position != fileBrowser.position) {
+            char *file = fileBrowser.getFile(position);
+            debug("SAMPLE_SELECTOR: %f %s\n", value, file);
+            AudioHandler::get().audioGranular.open(file);
+        }
     }),
 };
 
