@@ -19,6 +19,9 @@ MidiMapping midiMappings[] = {
     MidiMapping("GRAIN_SPRAY", [](float value) {
         AudioHandler::get().audioGranular.setSpray(value);
     }),
+    MidiMapping("GRAIN_DELAY", [](float value) {
+        AudioHandler::get().audioGranular.setDelay(value);
+    }),
 };
 
 const uint8_t MIDI_MAPS = sizeof(midiMappings) / sizeof(midiMappings[0]);

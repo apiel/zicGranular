@@ -56,11 +56,16 @@ protected:
         initGrain(grain, grain.sampleStep);
     }
 
-    float getRand()
+    int getRand()
     {
         // could create a lookup table ?
         srand(time(0));
-        return (rand() / (float)RAND_MAX);  
+        return rand();
+    }
+
+    float getRandPct()
+    {
+        return getRand() / (float)RAND_MAX;
     }
 
     void initGrain(Grain& grain, float sampleStep)
@@ -69,13 +74,13 @@ protected:
         grain.pos = 0.0f;
 
         // sprayToAdd is a random value between 0 and spray from starting point till end of file
-        float sprayToAdd = spray ? (getRand() * spray * (1 - start)) : 0.0;
+        float sprayToAdd = spray ? (getRandPct() * spray * (1 - start)) : 0.0;
         grain.start = (start + sprayToAdd) * sfinfo.frames;
 
         // we deduct minGrainSampleCount to avoid grainSize to be too small
         grain.sampleCount = (sfinfo.frames - (grain.start + minGrainSampleCount)) * grainSize + minGrainSampleCount;
 
-        grain.delay = delay ? ((rand() % delay) * SAMPLE_RATE * 0.001f) : 0;
+        grain.delay = delay ? (getRand() % delay) : 0;
     }
 
     float envelopAttack(Voice& voice)
@@ -166,7 +171,7 @@ public:
     float start = 0.0f;
     float grainSize = 0.2;
     float spray = 0.1;
-    uint16_t delay = 0;
+    uint64_t delay = 0;
     uint16_t attack = 300;
     uint16_t release = 1000;
 
@@ -232,13 +237,13 @@ public:
     /**
      * @brief Set the Delay before grain start to play
      *
-     * @param delay in ms
+     * @param delay where 0 is no delay and 1 is 5000ms
      * @return AudioGranular&
      */
-    AudioGranular& setDelay(int32_t _delay)
+    AudioGranular& setDelay(float value)
     {
-        delay = range(_delay, 0, 30000); // should it be between 0 and 1000?
-        printf("delay %d ms\n", delay);
+        delay = range(value, 0.0f, 1.0f) * 5000 * SAMPLE_RATE * 0.001f;
+        printf("delay %ld\n", delay);
         return *this;
     }
 
