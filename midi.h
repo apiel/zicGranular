@@ -8,7 +8,7 @@
 
 MidiMapping midiMappings[] = {
     MidiMapping("GRAIN_START_POSITION", [](float value) {
-        printf("GRAIN_START_POSITION value %f\n", value);
+        AudioHandler::get().audioGranular.setStart(value);
     }),
     MidiMapping("GRAIN_DENSIY", [](float value) {
         AudioHandler::get().audioGranular.setDensity(value);

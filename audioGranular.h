@@ -13,15 +13,8 @@ using namespace std;
 #define AUDIO_BUFFER_SIZE SAMPLE_RATE* AUDIO_BUFFER_SECONDS
 #define MAX_GRAINS_PER_VOICE 24
 #define MAX_GRAIN_VOICES 4
-#define START_POINTS 8
 
 class AudioGranular {
-public:
-    struct Start {
-        uint16_t position = 0;
-        bool active = false;
-    } starts[START_POINTS];
-
 protected:
     uint64_t voicePosition = 0;
     int64_t grainSampleCount = 0;
@@ -60,29 +53,14 @@ protected:
         initGrain(grain, grain.sampleStep);
     }
 
-    Start* getStart()
-    {
-        Start* start = NULL;
-        uint8_t randomStart = rand() % START_POINTS;
-        for (uint8_t s = 0; s < randomStart; s++) {
-            if (starts[s].active) {
-                start = &starts[s];
-            }
-        }
-        return start;
-    }
-
     void initGrain(Grain& grain, float sampleStep)
     {
-        Start* start = getStart();
-        if (start) {
-            grain.sampleStep = sampleStep;
-            grain.pos = 0.0f;
-            // TODO spray doesnt need to be negative anymore
-            uint16_t _spray = spray ? ((rand() % spray) * SAMPLE_RATE * 0.001f) : 0;
-            grain.start = range(start->position + _spray, 0, sfinfo.frames);
-            grain.delay = delay ? ((rand() % delay) * SAMPLE_RATE * 0.001f) : 0;
-        }
+        grain.sampleStep = sampleStep;
+        grain.pos = 0.0f;
+        // TODO spray doesnt need to be negative anymore
+        uint16_t _spray = spray ? ((rand() % spray) * SAMPLE_RATE * 0.001f) : 0;
+        grain.start = range(start + _spray, 0, sfinfo.frames);
+        grain.delay = delay ? ((rand() % delay) * SAMPLE_RATE * 0.001f) : 0;
     }
 
     float envelopAttack(Voice& voice)
@@ -165,16 +143,6 @@ protected:
         return voices[voiceToSteal];
     }
 
-    void initStartPositions()
-    {
-        float startStep = sfinfo.frames / START_POINTS;
-        for (uint8_t s = 0; s < START_POINTS; s++) {
-            starts[s].position = startStep * s;
-            starts[s].active = false;
-        }
-        starts[0].active = true;
-    }
-
 public:
     SF_INFO sfinfo;
     SNDFILE* file = NULL;
@@ -185,6 +153,8 @@ public:
     uint16_t delay = 0;
     uint16_t attack = 300;
     uint16_t release = 1000;
+    int64_t start = 0;
+    float startPct = 0.0f;
 
     AudioGranular()
     {
@@ -259,18 +229,19 @@ public:
         return *this;
     }
 
+
     /**
-     * @brief Toggle the Start position of the sample to play
+     * @brief Set the Start position of the sample to play
      *
-     * @param index of the start position
+     * @param _start position from 0.0 to 1.0, where 0.0 is the start of the sample
+     * and 1.0 the end of the sample
      * @return AudioGranular&
      */
-    AudioGranular& toggleStart(uint8_t index)
+    AudioGranular& setStart(float value)
     {
-        if (index < START_POINTS) {
-            starts[index].active = !starts[index].active;
-            printf("toggleStart %d %d\n", index, starts[index].active);
-        }
+        startPct = range(value, 0.0f, 1.0f);
+        start = startPct * sfinfo.frames;
+        printf("setStart %ld\n", start);
         return *this;
     }
 
@@ -324,7 +295,7 @@ public:
 
         sf_read_float(file, buffer, AUDIO_BUFFER_SIZE);
 
-        initStartPositions();
+        setStart(startPct);
 
         return *this;
     }
