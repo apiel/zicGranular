@@ -37,4 +37,20 @@ void showAudioDeviceInfo()
     printf("\n");
 }
 
+unsigned int getAudioDeviceId(char * name)
+{
+    unsigned int deviceCount = audio.getDeviceCount();
+
+    RtAudio::DeviceInfo rtInfo;
+    for (unsigned int i = 0; i < deviceCount; i++) {
+        rtInfo = audio.getDeviceInfo(i);
+        if (rtInfo.probed == true) {
+            if (rtInfo.name.find(name) != std::string::npos) {
+                return i;
+            }
+        }
+    }
+    return 0;
+}
+
 #endif
