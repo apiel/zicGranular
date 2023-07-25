@@ -1,6 +1,6 @@
-#include "def.h"
-#include "config.h"
 #include "audio.h"
+#include "config.h"
+#include "def.h"
 
 int main(int argc, char* args[])
 {

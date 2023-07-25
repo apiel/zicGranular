@@ -20,7 +20,6 @@ const uint16_t minGrainSampleCount = MIN_GRAIN_SIZE_MS * SAMPLE_RATE * 0.001f;
 class AudioGranular {
 protected:
     uint64_t voicePosition = 0;
-    int64_t grainSampleCount = 0;
     float buffer[AUDIO_BUFFER_SIZE];
     float attackStep = 0.0f;
     float releaseStep = 0.0f;
@@ -28,6 +27,7 @@ protected:
     struct Grain {
         float pos;
         int64_t start;
+        int64_t sampleCount;
         int64_t delay;
         float sampleStep;
     };
@@ -56,13 +56,25 @@ protected:
         initGrain(grain, grain.sampleStep);
     }
 
+    float getRand()
+    {
+        // could create a lookup table ?
+        srand(time(0));
+        return (rand() / (float)RAND_MAX);  
+    }
+
     void initGrain(Grain& grain, float sampleStep)
     {
         grain.sampleStep = sampleStep;
         grain.pos = 0.0f;
-        // TODO spray doesnt need to be negative anymore
-        uint16_t _spray = spray ? ((rand() % spray) * SAMPLE_RATE * 0.001f) : 0;
-        grain.start = range(start + _spray, 0, sfinfo.frames);
+
+        // sprayToAdd is a random value between 0 and spray from starting point till end of file
+        float sprayToAdd = spray ? (getRand() * spray * (1 - start)) : 0.0;
+        grain.start = (start + sprayToAdd) * sfinfo.frames;
+
+        // we deduct minGrainSampleCount to avoid grainSize to be too small
+        grain.sampleCount = (sfinfo.frames - (grain.start + minGrainSampleCount)) * grainSize + minGrainSampleCount;
+
         grain.delay = delay ? ((rand() % delay) * SAMPLE_RATE * 0.001f) : 0;
     }
 
@@ -108,7 +120,7 @@ protected:
             } else {
                 int64_t samplePos = (uint64_t)grain.pos + grain.start;
                 // if (samplePos < sfinfo.frames && (int64_t)grain.pos < grainSampleCount) { // is samplePos < sfinfo.frames even necessary if start calculated properly
-                if ((int64_t)grain.pos < grainSampleCount) {
+                if ((int64_t)grain.pos < grain.sampleCount) {
                     grain.pos += grain.sampleStep;
                     sample += buffer[samplePos] * env;
                 } else {
@@ -151,13 +163,12 @@ public:
     SNDFILE* file = NULL;
 
     uint8_t density = 4;
+    float start = 0.0f;
     float grainSize = 0.2;
-    uint16_t spray = 1000;
+    float spray = 0.1;
     uint16_t delay = 0;
     uint16_t attack = 300;
     uint16_t release = 1000;
-    int64_t start = 0;
-    float startPct = 0.0f;
 
     AudioGranular()
     {
@@ -185,24 +196,21 @@ public:
     AudioGranular& setGrainSize(float value)
     {
         grainSize = range(value, 0.0, 1.0);
-        // we deduct minGrainSampleCount to avoid grainSize to be too small
-        // we also deduct spray to avoid grainSize to be too big
-        grainSampleCount = (sfinfo.frames - (start + minGrainSampleCount + spray)) * grainSize + minGrainSampleCount;
-        printf("grainSampleCount %ld grainSize %f\n", grainSampleCount, grainSize);
+        printf("grainSize %f\n", grainSize);
         return *this;
     }
 
     /**
-     * @brief Set the Spray of the grain start position, giving +/- ms random position to
+     * @brief Set the Spray of the grain start position, giving random position to
      * the grain start position.
      *
-     * @param spray in ms
+     * @param spray
      * @return AudioGranular&
      */
-    AudioGranular& setSpray(int32_t _spray)
+    AudioGranular& setSpray(float value)
     {
-        spray = range(_spray, 0, 30000); // should it be between 0 and 1000?
-        printf("spray %d ms\n", spray);
+        spray = range(value, 0.0, 1.0);
+        printf("spray %f\n", spray);
         return *this;
     }
 
@@ -243,10 +251,8 @@ public:
      */
     AudioGranular& setStart(float value)
     {
-        startPct = range(value, 0.0f, 1.0f);
-        start = startPct * sfinfo.frames;
-        printf("setStart %ld\n", start);
-        setGrainSize(grainSize);
+        start = range(value, 0.0f, 1.0f);
+        printf("setStart %f\n", start);
         return *this;
     }
 
@@ -299,8 +305,6 @@ public:
         printf("Audio file %s sampleCount %ld sampleRate %d\n", filename, (long)sfinfo.frames, sfinfo.samplerate);
 
         sf_read_float(file, buffer, AUDIO_BUFFER_SIZE);
-
-        setStart(startPct);
 
         return *this;
     }
