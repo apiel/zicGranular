@@ -3,10 +3,10 @@
 
 #include <RtAudio.h>
 #include <RtMidi.h>
+#include <math.h>
 #include <stdint.h>
 #include <string.h>
 #include <unistd.h>
-#include <math.h>
 
 #ifndef APP_LOG
 #define APP_LOG printf
@@ -104,6 +104,17 @@ void setMasterVolume(float volume, float gain = gainOutput)
     gainOutput = gain;
     masterVolume = volume;
     masterVolumeWithGain = gainOutput * masterVolume;
+}
+
+int noDebug(const char* format, ...)
+{
+    return 0;
+}
+int (*debug)(const char* format, ...) = noDebug;
+
+void enableDebug()
+{
+    debug = APP_LOG;
 }
 
 #endif

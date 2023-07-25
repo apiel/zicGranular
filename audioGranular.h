@@ -89,7 +89,7 @@ protected:
         if (voice.env >= 1.0f) {
             voice.env = 1.0f;
             voice.envelop = &AudioGranular::envelopSustain;
-            // printf("envelopAttack finished, set env to %f\n", voice.env);
+            // debug("envelopAttack finished, set env to %f\n", voice.env);
         }
         return voice.env;
     }
@@ -105,7 +105,7 @@ protected:
         if (voice.env <= 0.0f) {
             voice.env = 0.0f;
             voice.note = -1;
-            // printf("envelopRelease finished, set env to %f\n", voice.env);
+            // debug("envelopRelease finished, set env to %f\n", voice.env);
         }
         return voice.env;
     }
@@ -142,7 +142,7 @@ protected:
         for (uint8_t v = 0; v < MAX_GRAIN_VOICES; v++) {
             Voice& voice = voices[v];
             if (voice.note == note) {
-                printf("getNextVoice: voice already running %d\n", note);
+                debug("getNextVoice: voice already running %d\n", note);
                 return voice;
             }
         }
@@ -159,7 +159,7 @@ protected:
             }
         }
 
-        printf("getNextVoice: no voice available. Steal voice %d.\n", voiceToSteal);
+        debug("getNextVoice: no voice available. Steal voice %d.\n", voiceToSteal);
         return voices[voiceToSteal];
     }
 
@@ -201,7 +201,7 @@ public:
     AudioGranular& setGrainSize(float value)
     {
         grainSize = range(value, 0.0, 1.0);
-        printf("grainSize %f\n", grainSize);
+        debug("grainSize %f\n", grainSize);
         return *this;
     }
 
@@ -215,7 +215,7 @@ public:
     AudioGranular& setSpray(float value)
     {
         spray = range(value, 0.0, 1.0);
-        printf("spray %f\n", spray);
+        debug("spray %f\n", spray);
         return *this;
     }
 
@@ -228,7 +228,7 @@ public:
     AudioGranular& setDensity(float value)
     {
         density = value * (MAX_GRAINS_PER_VOICE - 1) + 1; // 1 to MAX_GRAINS_PER_VOICE
-        printf("density %d\n", density);
+        debug("density %d\n", density);
         return *this;
     }
 
@@ -242,7 +242,7 @@ public:
     AudioGranular& setStart(float value)
     {
         start = range(value, 0.0f, 1.0f);
-        printf("setStart %f\n", start);
+        debug("setStart %f\n", start);
         return *this;
     }
 
@@ -257,7 +257,7 @@ public:
         // delay = range(value, 0.0f, 1.0f) * SAMPLE_RATE * 0.001f * 1000;
         // can be simplified to:
         delay = range(value, 0.0f, 1.0f) * SAMPLE_RATE;
-        printf("delay %ld\n", delay);
+        debug("delay %ld\n", delay);
         return *this;
     }
 
@@ -273,7 +273,7 @@ public:
         // can be simplified to:
         uint64_t attackSamples = range(value, 0.0f, 1.0f) * SAMPLE_RATE * 5;
         attackStep = 1.0f / attackSamples;
-        printf("attack %ld samples %f step\n", attackSamples, attackStep);
+        debug("attack %ld samples %f step\n", attackSamples, attackStep);
         return *this;
     }
 
@@ -289,7 +289,7 @@ public:
         // can be simplified to:
         uint64_t releaseSamples = range(value, 0.0f, 1.0f) * SAMPLE_RATE * 10;
         releaseStep = 1.0f / releaseSamples;
-        printf("release %ld samples %f step\n", releaseSamples, releaseStep);
+        debug("release %ld samples %f step\n", releaseSamples, releaseStep);
         return *this;
     }
 
@@ -306,10 +306,10 @@ public:
         close();
 
         if (!(file = sf_open(filename, SFM_READ, &sfinfo))) {
-            printf("Error: could not open file %s\n", filename);
+            APP_LOG("Error: could not open file %s\n", filename);
             return *this;
         }
-        printf("Audio file %s sampleCount %ld sampleRate %d\n", filename, (long)sfinfo.frames, sfinfo.samplerate);
+        APP_LOG("Audio file %s sampleCount %ld sampleRate %d\n", filename, (long)sfinfo.frames, sfinfo.samplerate);
 
         sf_read_float(file, buffer, AUDIO_BUFFER_SIZE);
 
@@ -350,7 +350,7 @@ public:
         for (uint8_t g = 0; g < density; g++) {
             initGrain(voice.grains[g], sampleStep);
         }
-        printf("noteOn: %d %d %f\n", note, velocity, sampleStep);
+        debug("noteOn: %d %d %f\n", note, velocity, sampleStep);
 
         return *this;
     }
@@ -361,12 +361,12 @@ public:
             Voice& voice = voices[v];
             if (voice.note == note) {
                 voice.envelop = &AudioGranular::envelopRelease;
-                printf("noteOff set on to false: %d %d\n", note, velocity);
+                debug("noteOff set on to false: %d %d\n", note, velocity);
                 return *this;
             }
         }
 
-        printf("noteOff: note not found %d %d\n", note, velocity);
+        debug("noteOff: note not found %d %d\n", note, velocity);
         return *this;
     }
 

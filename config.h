@@ -49,6 +49,11 @@ void assignKeyValue(char* key, char* value)
     } else if (strcmp(key, "GAIN_OUTPUT") == 0) {
         setMasterVolume(masterVolume, atof(value));
         printf("Gain output set: %f\n", gainOutput);
+    } else if (strcmp(key, "DEBUG") == 0) {
+        if (strcmp(value, "true") == 0) {
+            enableDebug();
+            printf("Debug mode enabled\n");
+        }
     } else if (strcmp(key, "SEQUENCER_CHANNEL") == 0) {
         midiSequencerChannel = atoi(value);
         printf("Midi sequencer channell set: %d\n", midiSequencerChannel);
