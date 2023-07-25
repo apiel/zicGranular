@@ -185,7 +185,9 @@ public:
     AudioGranular& setGrainSize(float value)
     {
         grainSize = range(value, 0.0, 1.0);
-        grainSampleCount = (sfinfo.frames - (start + minGrainSampleCount)) * grainSize + minGrainSampleCount;
+        // we deduct minGrainSampleCount to avoid grainSize to be too small
+        // we also deduct spray to avoid grainSize to be too big
+        grainSampleCount = (sfinfo.frames - (start + minGrainSampleCount + spray)) * grainSize + minGrainSampleCount;
         printf("grainSampleCount %ld grainSize %f\n", grainSampleCount, grainSize);
         return *this;
     }
