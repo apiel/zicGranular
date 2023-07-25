@@ -5,7 +5,6 @@
 #include "def.h"
 #include "fileBrowser.h"
 #include "master.h"
-#include "tempo.h"
 
 class AudioHandler {
 protected:
@@ -19,7 +18,6 @@ protected:
     }
 
 public:
-    Tempo& tempo = Tempo::get();
     AudioGranular audioGranular;
     FileBrowser fileBrowser = FileBrowser("./samples");
 

@@ -19,15 +19,16 @@ protected:
         DIR* dir = opendir(folder);
         if (dir != NULL) {
             struct dirent* directory;
-            uint8_t i = 0;
-            while ((directory = readdir(dir)) != NULL && i < FILE_BROWSER_FILES_MAX) {
+            count = 0;
+            while ((directory = readdir(dir)) != NULL && count < FILE_BROWSER_FILES_MAX) {
                 if (strcmp(directory->d_name, ".") != 0 && strcmp(directory->d_name, "..") != 0) {
-                    strncpy(files[i], directory->d_name, FILE_BROWSER_FILENAME_LEN);
-                    i++;
+                    strncpy(files[count], directory->d_name, FILE_BROWSER_FILENAME_LEN);
+                    count++;
                 }
             }
             closedir(dir);
         }
+        APP_INFO("Found %d files in %s\n", count, folder);
     }
 
     void sort()
@@ -54,6 +55,7 @@ protected:
 
 public:
     uint8_t position = 0;
+    uint8_t count = 0;
 
     FileBrowser(const char* _folder)
         : folder(_folder)

@@ -31,6 +31,10 @@ MidiMapping midiMappings[] = {
     MidiMapping("ENV_RELEASE", [](float value) {
         AudioHandler::get().audioGranular.setRelease(value);
     }),
+    MidiMapping("SAMPLE_SELECTOR", [](float value) {
+        // AudioHandler::get().audioGranular.setPitch(value);
+        printf("SAMPLE_SELECTOR: %f\n", value);
+    }),
 };
 
 const uint8_t MIDI_MAPS = sizeof(midiMappings) / sizeof(midiMappings[0]);
