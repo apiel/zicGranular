@@ -95,5 +95,6 @@ float midiFreq[128] = {
 
 uint8_t midiSequencerChannel = 0;
 char audioOutput[255] = "";
+float gainOutput = 1.0f;
 
 #endif
