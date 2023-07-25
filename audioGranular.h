@@ -13,6 +13,9 @@ using namespace std;
 #define AUDIO_BUFFER_SIZE SAMPLE_RATE* AUDIO_BUFFER_SECONDS
 #define MAX_GRAINS_PER_VOICE 24
 #define MAX_GRAIN_VOICES 4
+#define MIN_GRAIN_SIZE_MS 20
+
+const uint16_t minGrainSampleCount = MIN_GRAIN_SIZE_MS * SAMPLE_RATE * 0.001f;
 
 class AudioGranular {
 protected:
@@ -148,7 +151,7 @@ public:
     SNDFILE* file = NULL;
 
     uint8_t density = 4;
-    uint16_t grainSize = 300;
+    float grainSize = 0.2;
     uint16_t spray = 1000;
     uint16_t delay = 0;
     uint16_t attack = 300;
@@ -174,16 +177,16 @@ public:
     }
 
     /**
-     * @brief Set the Grain Size meaning the length duration of the grain in ms.
+     * @brief Set the Grain Size meaning the length duration of the grain.
      *
-     * @param grainSize in ms
+     * @param grainSize
      * @return AudioGranular&
      */
-    AudioGranular& setGrainSize(int32_t _grainSize)
+    AudioGranular& setGrainSize(float value)
     {
-        grainSize = range(_grainSize, 20, 30000); // should it be between 20 and 1000?
-        grainSampleCount = _grainSize * SAMPLE_RATE * 0.001f;
-        printf("grainSampleCount %ld grainSize %d ms\n", grainSampleCount, grainSize);
+        grainSize = range(value, 0.0, 1.0);
+        grainSampleCount = (sfinfo.frames - (start + minGrainSampleCount)) * grainSize + minGrainSampleCount;
+        printf("grainSampleCount %ld grainSize %f\n", grainSampleCount, grainSize);
         return *this;
     }
 
@@ -207,9 +210,9 @@ public:
      * @param density
      * @return AudioGranular&
      */
-    AudioGranular& setDensity(float _density)
+    AudioGranular& setDensity(float value)
     {
-        density = _density * (MAX_GRAINS_PER_VOICE - 1) + 1; // 1 to MAX_GRAINS_PER_VOICE
+        density = value * (MAX_GRAINS_PER_VOICE - 1) + 1; // 1 to MAX_GRAINS_PER_VOICE
         printf("density %d\n", density);
         return *this;
     }
@@ -229,7 +232,6 @@ public:
         return *this;
     }
 
-
     /**
      * @brief Set the Start position of the sample to play
      *
@@ -242,6 +244,7 @@ public:
         startPct = range(value, 0.0f, 1.0f);
         start = startPct * sfinfo.frames;
         printf("setStart %ld\n", start);
+        setGrainSize(grainSize);
         return *this;
     }
 

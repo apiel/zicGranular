@@ -14,7 +14,7 @@ MidiMapping midiMappings[] = {
         AudioHandler::get().audioGranular.setDensity(value);
     }),
     MidiMapping("GRAIN_SIZE", [](float value) {
-        printf("GRAIN_SIZE value %f\n", value);
+        AudioHandler::get().audioGranular.setGrainSize(value);
     }),
 };
 
