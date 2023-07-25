@@ -25,8 +25,11 @@ public:
     uint8_t valuePosition = 0;
     uint8_t msg[2] = { 0x00, 0x00 };
 
-    MidiMapping(const char* _key)
+    void (*callback)(uint16_t value, float pct) = NULL;
+
+    MidiMapping(const char* _key, void (*_callback)(uint16_t value, float pct))
         : key(_key)
+        , callback(_callback)
     {
     }
 
@@ -42,14 +45,7 @@ public:
                 value = (message->at(2) << 7) + message->at(1);
                 pct = (float)value / 16383.0f;
             }
-
-            printf("Midi message matched: ");
-            unsigned int nBytes = message->size();
-            for (unsigned int i = 0; i < nBytes; i++) {
-                printf("%02x ", (int)message->at(i));
-            }
-            printf(" = %d = %f\n", value, pct);
-
+            callback(value, pct);
             return true;
         }
         return false;

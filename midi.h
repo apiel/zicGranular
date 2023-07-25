@@ -7,9 +7,15 @@
 
 #define MIDI_MAPS 3
 MidiMapping midiMappings[MIDI_MAPS] = {
-    MidiMapping("GRAIN_START_POSITION"),
-    MidiMapping("GRAIN_DENSIY"),
-    MidiMapping("GRAIN_SIZE"),
+    MidiMapping("GRAIN_START_POSITION", [](uint16_t value, float pct) {
+        printf("GRAIN_START_POSITION value %d and percentage %f\n", value, pct);
+    }),
+    MidiMapping("GRAIN_DENSIY", [](uint16_t value, float pct) {
+        printf("GRAIN_DENSIY value %d and percentage %f\n", value, pct);
+    }),
+    MidiMapping("GRAIN_SIZE", [](uint16_t value, float pct) {
+        printf("GRAIN_SIZE value %d and percentage %f\n", value, pct);
+    }),
 };
 
 void midiControllerCallback(double deltatime, std::vector<unsigned char>* message, void* userData)
