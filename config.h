@@ -47,7 +47,7 @@ void assignKeyValue(char* key, char* value)
         strcpy(audioOutput, trimChar(value));
         printf("Audio output set: %s\n", audioOutput);
     } else if (strcmp(key, "GAIN_OUTPUT") == 0) {
-        gainOutput = atof(value);
+        setMasterVolume(masterVolume, atof(value));
         printf("Gain output set: %f\n", gainOutput);
     } else if (strcmp(key, "SEQUENCER_CHANNEL") == 0) {
         midiSequencerChannel = atoi(value);

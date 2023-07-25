@@ -96,5 +96,14 @@ float midiFreq[128] = {
 uint8_t midiSequencerChannel = 0;
 char audioOutput[255] = "";
 float gainOutput = 1.0f;
+float masterVolume = 1.0f;
+float masterVolumeWithGain = gainOutput * masterVolume;
+
+void setMasterVolume(float volume, float gain = gainOutput)
+{
+    gainOutput = gain;
+    masterVolume = volume;
+    masterVolumeWithGain = gainOutput * masterVolume;
+}
 
 #endif
