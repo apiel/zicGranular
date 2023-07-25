@@ -6,13 +6,6 @@
 
 AudioHandler& audioHandler = AudioHandler::get();
 
-// float lenDivider = 1.0f / sizeof(float);
-// void audioCallBack(void* userdata, Uint8* stream, int len)
-// {
-//     float* buf = (float*)stream;
-//     audio.samples(buf, len * lenDivider);
-// }
-
 int audioCallback(void* outputBuffer, void* /*inputBuffer*/, unsigned int nBufferFrames,
     double /*streamTime*/, RtAudioStreamStatus status, void* data)
 {
