@@ -32,6 +32,8 @@ public:
             shape = 2 * (drive - 0.000001) / (1 - (drive - 0.000001));
         }
 
+        debug("Distortion: drive=%f shape=%f\n", drive, shape);
+
         return *this;
     }
 };

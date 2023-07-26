@@ -40,6 +40,9 @@ MidiMapping midiMappings[] = {
             AudioHandler::get().audioGranular.open(file);
         }
     }),
+    MidiMapping("DISTORTION", [](float value) {
+        AudioHandler::get().distortion.set(value);
+    }),
 };
 
 const uint8_t MIDI_MAPS = sizeof(midiMappings) / sizeof(midiMappings[0]);
