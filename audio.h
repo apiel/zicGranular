@@ -43,6 +43,9 @@ unsigned int getAudioDeviceId(char * name)
             }
         }
     }
+    debug("Audio device %s not found\n", name);
+    rtInfo = audio.getDeviceInfo(0);
+    debug("Using default device %s\n", rtInfo.name.c_str());
     return 0;
 }
 
