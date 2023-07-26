@@ -34,6 +34,10 @@ public:
     void samples(float* buf, int len)
     {
         audioGranular.samples(buf, len);
+
+        for (int i = 0; i < len; i++) {
+            buf[i] *= masterVolumeWithGain;
+        }
     }
 };
 

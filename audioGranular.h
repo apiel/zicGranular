@@ -328,7 +328,7 @@ public:
             Voice& voice = voices[v];
             if (voice.note != -1) {
                 for (i = 0; i < len; i++) {
-                    buf[i] += sample(voice) * masterVolumeWithGain;
+                    buf[i] += sample(voice);
                 }
             }
         }
