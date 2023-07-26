@@ -23,9 +23,6 @@ protected:
     float buf0 = 0;
     float buf1 = 0;
 
-    float joystickCutoffMod = 0.0;
-    float joystickResonanceMod = 0.0;
-
     void calculateVar()
     {
         calculateVar(cutoff, resonance);
@@ -72,18 +69,6 @@ public:
         return sample(inputValue, cutoff);
     }
 
-    // float sample(float inputValue, float modCutoff, float modResonance)
-    // {
-    //     // could be optimized and apply only if modCutoff or modResonance != 0
-    //     float _cutoff = cutoff + ((1.0 - cutoff) * modCutoff); // I am not sure this make sense!!
-    //     float _resonance = resonance + ((1.0 - resonance) * modResonance);
-
-    //     // optimized if reso = 0 then feedback = 0, no need to calculate...
-    //     calculateVar(_cutoff, _resonance);
-
-    //     return sample(inputValue, _cutoff);
-    // }
-
     Filter& set(int16_t val)
     {
         // Frequency should be under 7350Hz else cutoff is = 1 and then no sound
@@ -107,26 +92,20 @@ public:
 
         calculateVar();
 
+        debug("Filter: value=%d cutoff=%f\n", value, cutoff);
+
         return *this;
     }
 
-    int16_t getFrequency()
-    {
-        if (mode == FILTER_MODE_OFF) {
-            return 0;
-        }
-        return (int16_t)(asin(cutoff / 2.0) * SAMPLE_RATE / M_PI);
-    }
-
-    float getPctValue()
-    {
-        if (mode == FILTER_MODE_LOWPASS_12) {
-            return 100 * (float)value / -7250.0;
-        }
-        if (mode == FILTER_MODE_HIGHPASS_12) {
-            return 100 * (float)value / 7250.0;
-        }
-        return 0.0f;
+    /**
+     * @brief set filter cutoff
+     * 
+     * @param value where 0.0 is 7250Hz LPF, 0.5 is no filter, 1.0 is 7250Hz HPF
+     * @return Filter& 
+     */
+    Filter& set(float value) {
+        int16_t val = range(value, 0.0, 1.0) * 7250.0 * 2.0 - 7250.0;
+        return set(val);
     }
 
     Filter& setResonance(float _res)
@@ -134,20 +113,10 @@ public:
         resonance = range(_res, 0.00, 0.99);
         calculateVar();
 
+        debug("Filter: resonance=%f\n", resonance);
+
         return *this;
     };
-
-    const char* getName()
-    {
-        switch (mode) {
-        case FILTER_MODE_LOWPASS_12:
-            return "LPF ";
-        case FILTER_MODE_HIGHPASS_12:
-            return "HPF ";
-        default:
-            return "Filter";
-        }
-    }
 };
 
 #endif

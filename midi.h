@@ -43,6 +43,12 @@ MidiMapping midiMappings[] = {
     MidiMapping("DISTORTION", [](float value) {
         AudioHandler::get().distortion.set(value);
     }),
+    MidiMapping("FILTER_CUTOFF", [](float value) {
+        AudioHandler::get().filter.set(value);
+    }),
+    MidiMapping("FILTER_RESONANCE", [](float value) {
+        AudioHandler::get().filter.setResonance(value);
+    }),
 };
 
 const uint8_t MIDI_MAPS = sizeof(midiMappings) / sizeof(midiMappings[0]);
