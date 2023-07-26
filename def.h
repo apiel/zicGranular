@@ -97,19 +97,6 @@ float midiFreq[128] = {
     8372.0180896192, 8869.8441912599, 9397.2725733570, 9956.0634791066, 10548.0818212118, 11175.3034058561, 11839.8215267723, 12543.8539514160
 };
 
-uint8_t midiSequencerChannel = 0;
-char audioOutput[255] = "";
-float gainOutput = 1.0f;
-float masterVolume = 1.0f;
-float masterVolumeWithGain = gainOutput * masterVolume;
-
-void setMasterVolume(float volume, float gain = gainOutput)
-{
-    gainOutput = gain;
-    masterVolume = volume;
-    masterVolumeWithGain = gainOutput * masterVolume;
-}
-
 bool debugMode = false;
 int noDebug(const char* format, ...)
 {
@@ -121,6 +108,21 @@ void enableDebug()
 {
     debugMode = true;
     debug = APP_PRINT;
+}
+
+uint8_t midiSequencerChannel = 0;
+char audioOutput[255] = "";
+float gainOutput = 1.0f;
+float masterVolume = 1.0f;
+float masterVolumeWithGain = gainOutput * masterVolume;
+
+void setMasterVolume(float volume, float gain = gainOutput)
+{
+    gainOutput = gain;
+    masterVolume = volume;
+    masterVolumeWithGain = gainOutput * masterVolume;
+
+    debug("setMaster: volume %f\n", volume);
 }
 
 #endif
