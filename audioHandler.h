@@ -6,12 +6,9 @@
 #include "distortion.h"
 #include "fileBrowser.h"
 #include "filter.h"
-#include "master.h"
 
 class AudioHandler {
 protected:
-    Master& master = Master::get();
-
     static AudioHandler* instance;
 
     AudioHandler()

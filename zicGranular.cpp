@@ -4,7 +4,9 @@
 
 #define AUDIO_API_PULSE 1
 
-#define AUDIO_API AUDIO_API_PULSE
+#ifndef AUDIO_API
+// #define AUDIO_API AUDIO_API_PULSE
+#endif
 
 #if AUDIO_API == AUDIO_API_PULSE
 #include "audio_pulse.h"

@@ -101,7 +101,7 @@ public:
         audioParams.deviceId = getAudioDeviceId(audioOutput);
         audioParams.nChannels = APP_CHANNELS;
         try {
-            audio.openStream(&audioParams, NULL, APP_AUDIO_FORMAT, SAMPLE_RATE, &bufferFrames, &audioCallback);
+            audio.openStream(&audioParams, NULL, RTAUDIO_FLOAT32, SAMPLE_RATE, &bufferFrames, &audioCallback);
             audio.startStream();
             while (audio.isStreamRunning()) {
                 usleep(100000); // 100ms
