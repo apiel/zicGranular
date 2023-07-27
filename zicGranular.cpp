@@ -1,7 +1,16 @@
 #include "audio.h"
-#include "audio_pulse.h"
 #include "config.h"
 #include "def.h"
+
+#define AUDIO_API pulse
+
+#if AUDIO_API == pulse
+#include "audio_pulse.h"
+AudioApi& audioApi = AudioPulse::get();
+#else
+#include "audio_rt.h"
+AudioApi& audioApi = AudioRT::get();
+#endif
 
 int main(int argc, char* args[])
 {
@@ -12,7 +21,8 @@ int main(int argc, char* args[])
         }
 
         if (strcmp(args[1], "--list") == 0) {
-            showAudioDeviceInfo();
+            // showAudioDeviceInfo();
+            audioApi.list();
             return 0;
         }
     }
@@ -23,24 +33,5 @@ int main(int argc, char* args[])
         return 1;
     }
 
-    // RtAudio::StreamParameters audioParams;
-
-    // // TODO should sample rate come from RtAudio::DeviceInfo  ?
-    // unsigned int bufferFrames = APP_AUDIO_CHUNK;
-    // audioParams.deviceId = getAudioDeviceId(audioOutput);
-    // audioParams.nChannels = APP_CHANNELS;
-    // try {
-    //     audio.openStream(&audioParams, NULL, APP_AUDIO_FORMAT, SAMPLE_RATE, &bufferFrames, &audioCallback);
-    //     audio.startStream();
-    //     while (audio.isStreamRunning()) {
-    //         usleep(100000); // 100ms
-    //     }
-    // } catch (RtAudioError& e) {
-    //     e.printMessage();
-    //     return 1;
-    // }
-
-    openpulse();
-
-    return 0;
+    return audioApi.open();
 }

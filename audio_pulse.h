@@ -1,5 +1,5 @@
-#ifndef _AUDIO_P_H_
-#define _AUDIO_P_H_
+#ifndef _AUDIO_API_H_
+#define _AUDIO_API_H_
 
 #include <pulse/simple.h>
 
@@ -35,5 +35,33 @@ int openpulse()
 
     return 0;
 }
+
+
+class AudioPulse : public AudioApi {
+protected:
+    static AudioPulse* instance;
+    AudioPulse() { }
+
+public:
+    static AudioPulse& get()
+    {
+        if (!instance) {
+            instance = new AudioPulse();
+        }
+        return *instance;
+    }
+
+    int open()
+    {
+        return openpulse();
+    }
+
+    void list()
+    {
+        // showAudioDeviceInfo();
+    }
+};
+
+AudioPulse* AudioPulse::instance = NULL;
 
 #endif
