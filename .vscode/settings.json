@@ -63,6 +63,7 @@
         "pulseaudio.h": "c",
         "simple.h": "c",
         "string.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "stdlib.h": "c"
     }
 }

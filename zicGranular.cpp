@@ -1,4 +1,5 @@
 #include "audio.h"
+#include "audio_pulse.h"
 #include "config.h"
 #include "def.h"
 
@@ -22,22 +23,24 @@ int main(int argc, char* args[])
         return 1;
     }
 
-    RtAudio::StreamParameters audioParams;
+    // RtAudio::StreamParameters audioParams;
 
-    // TODO should sample rate come from RtAudio::DeviceInfo  ?
-    unsigned int bufferFrames = APP_AUDIO_CHUNK;
-    audioParams.deviceId = getAudioDeviceId(audioOutput);
-    audioParams.nChannels = APP_CHANNELS;
-    try {
-        audio.openStream(&audioParams, NULL, APP_AUDIO_FORMAT, SAMPLE_RATE, &bufferFrames, &audioCallback);
-        audio.startStream();
-        while (audio.isStreamRunning()) {
-            usleep(100000); // 100ms
-        }
-    } catch (RtAudioError& e) {
-        e.printMessage();
-        return 1;
-    }
+    // // TODO should sample rate come from RtAudio::DeviceInfo  ?
+    // unsigned int bufferFrames = APP_AUDIO_CHUNK;
+    // audioParams.deviceId = getAudioDeviceId(audioOutput);
+    // audioParams.nChannels = APP_CHANNELS;
+    // try {
+    //     audio.openStream(&audioParams, NULL, APP_AUDIO_FORMAT, SAMPLE_RATE, &bufferFrames, &audioCallback);
+    //     audio.startStream();
+    //     while (audio.isStreamRunning()) {
+    //         usleep(100000); // 100ms
+    //     }
+    // } catch (RtAudioError& e) {
+    //     e.printMessage();
+    //     return 1;
+    // }
+
+    openpulse();
 
     return 0;
 }

@@ -10,7 +10,9 @@ RTAUDIO=`pkg-config --cflags --libs rtaudio`
 
 RTMIDI=`pkg-config --cflags --libs rtmidi`
 
-BUILD=-Wall zicGranular.cpp -fopenmp -Wno-narrowing $(RTAUDIO) $(LIDSND) $(RTMIDI)
+PULSEAUDIO=`pkg-config --cflags --libs libpulse-simple`
+
+BUILD=-Wall zicGranular.cpp -fopenmp -Wno-narrowing $(RTAUDIO) $(LIDSND) $(RTMIDI) $(PULSEAUDIO)
 
 linux: build run
 
