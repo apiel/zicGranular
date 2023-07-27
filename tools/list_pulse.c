@@ -1,4 +1,5 @@
 // gcc -o list_pulse list_pulse.c $(pkg-config --cflags --libs libpulse-simple)
+// gcc -o list_pulse list_pulse.c $(pkg-config --cflags --libs libpulse-simple) && ./list_pulse
 
 #include <pulse/pulseaudio.h>
 #include <pulse/simple.h>
@@ -7,9 +8,6 @@
 
 static void rt_pa_set_server_info(pa_context* context, const pa_server_info* info, void* userdata)
 {
-    (void)context;
-    pa_sample_spec ss;
-
     printf("default sink name: %s\n", info->default_sink_name);
 }
 
@@ -59,35 +57,6 @@ static void rt_pa_context_state_callback(pa_context* context, void* userdata)
 
 int main(int argc, char* argv[])
 {
-    // pa_simple* s;
-    // pa_sample_spec ss;
-
-    // ss.format = PA_SAMPLE_S16NE;
-    // ss.channels = 2;
-    // ss.rate = 44100;
-
-    // s = pa_simple_new(
-    //     NULL, // Use the default server.
-    //     "Fooapp", // Our application's name.
-    //     PA_STREAM_PLAYBACK,
-    //     NULL, // Use the default device.
-    //     "Music", // Description of our stream.
-    //     &ss, // Our sample format.
-    //     NULL, // Use default channel map
-    //     NULL, // Use default buffering attributes.
-    //     NULL // Ignore error code.
-    // );
-
-    // pa_simple_free(s);
-
-    // pa_mainloop* ml = NULL;
-    // if (!(ml = pa_mainloop_new())) {
-    //     fprintf(stderr, "pa_mainloop_new() failed.\n");
-    //     return 1;
-    // }
-
-    // pa_mainloop_free(ml);
-
     pa_mainloop* ml = NULL;
     pa_context* context = NULL;
     char* server = NULL;
@@ -113,28 +82,7 @@ int main(int argc, char* argv[])
 
     if (pa_mainloop_run(ml, &ret) < 0) {
         printf("pa_mainloop_run() failed.\n");
-        goto quit;
     }
-
-    if (ret != 0) {
-        printf("pa_mainloop_run() returned %d.\n", ret);
-        goto quit;
-    }
-
-    // // Check for devices that have been unplugged.
-    // unsigned int m;
-    // for (std::vector<RtAudio::DeviceInfo>::iterator it = deviceList_.begin(); it != deviceList_.end();) {
-    //     for (m = 0; m < paProbeInfo.deviceNames.size(); m++) {
-    //         if ((*it).name == paProbeInfo.deviceNames[m]) {
-    //             ++it;
-    //             break;
-    //         }
-    //     }
-    //     if (m == paProbeInfo.deviceNames.size()) { // not found so remove it from our list
-    //         it = deviceList_.erase(it);
-    //         paDeviceList_.erase(paDeviceList_.begin() + distance(deviceList_.begin(), it));
-    //     }
-    // }
 
 quit:
     if (context)
