@@ -2,9 +2,11 @@
 #include "config.h"
 #include "def.h"
 
-#define AUDIO_API pulse
+#define AUDIO_API_PULSE 1
 
-#if AUDIO_API == pulse
+#define AUDIO_API AUDIO_API_PULSE
+
+#if AUDIO_API == AUDIO_API_PULSE
 #include "audio_pulse.h"
 AudioApi& audioApi = AudioPulse::get();
 #else
