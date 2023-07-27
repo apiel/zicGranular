@@ -1,4 +1,4 @@
-// gcc -o test5 test5.c $(pkg-config --cflags --libs libpulse-simple)
+// gcc -o list_pulse list_pulse.c $(pkg-config --cflags --libs libpulse-simple)
 
 #include <pulse/pulseaudio.h>
 #include <pulse/simple.h>
@@ -18,8 +18,8 @@ static void rt_pa_set_sink_info(pa_context* c, const pa_sink_info* i,
     int eol, void* userdata)
 {
     if (eol) {
-        pa_mainloop_api* mlApi = (pa_mainloop_api*) userdata;
-        mlApi->quit( mlApi, 0 );
+        pa_mainloop_api* mlApi = (pa_mainloop_api*)userdata;
+        mlApi->quit(mlApi, 0);
         return;
     }
 
@@ -31,6 +31,8 @@ static void rt_pa_set_sink_info(pa_context* c, const pa_sink_info* i,
 // set. This one then calls the functions above.
 static void rt_pa_context_state_callback(pa_context* context, void* userdata)
 {
+    pa_mainloop_api* mlApi = (pa_mainloop_api*)userdata;
+
     switch (pa_context_get_state(context)) {
     case PA_CONTEXT_CONNECTING:
     case PA_CONTEXT_AUTHORIZING:
@@ -45,14 +47,13 @@ static void rt_pa_context_state_callback(pa_context* context, void* userdata)
         break;
 
     case PA_CONTEXT_TERMINATED:
-        printf("PA_CONTEXT_TERMINATED\n");
-        //   paProbeInfo->paMainLoopApi->quit( paProbeInfo->paMainLoopApi, 0 );
+        mlApi->quit(mlApi, 0);
         break;
 
     case PA_CONTEXT_FAILED:
     default:
         printf("PA_CONTEXT_FAILED\n");
-        //   paProbeInfo->paMainLoopApi->quit( paProbeInfo->paMainLoopApi, 1 );
+        mlApi->quit(mlApi, 0);
     }
 }
 
