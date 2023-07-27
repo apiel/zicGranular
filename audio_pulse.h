@@ -22,7 +22,8 @@ static void rt_pa_set_sink_info(pa_context* c, const pa_sink_info* i,
     }
 
     const char* name = pa_proplist_gets(i->proplist, "device.description");
-    printf("name: %s (outputChannels %d preferredSampleRate %d)\n", name, i->sample_spec.channels, i->sample_spec.rate);
+    // printf("name: %s (outputChannels %d preferredSampleRate %d)\n", name, i->sample_spec.channels, i->sample_spec.rate);
+    printf("- %s\n", name);
 }
 
 static void rt_pa_context_state_callback(pa_context* context, void* userdata)
