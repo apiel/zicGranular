@@ -108,6 +108,7 @@ void enableDebug()
 {
     debugMode = true;
     debug = APP_PRINT;
+    APP_INFO("Debug mode enabled\n");
 }
 
 uint8_t midiSequencerChannel = 0;

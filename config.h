@@ -52,7 +52,6 @@ void assignKeyValue(char* key, char* value)
     } else if (strcmp(key, "DEBUG") == 0) {
         if (strcmp(value, "true") == 0) {
             enableDebug();
-            APP_INFO("Debug mode enabled\n");
         }
     } else if (strcmp(key, "SEQUENCER_CHANNEL") == 0) {
         midiSequencerChannel = atoi(value);
