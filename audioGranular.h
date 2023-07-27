@@ -169,11 +169,11 @@ public:
 
     uint8_t density = 4;
     float start = 0.0f;
-    float grainSize = 0.2;
+    float grainSize = 0.5;
     float spray = 0.1;
     uint64_t delay = 0;
-    uint16_t attack = 300;
-    uint16_t release = 1000;
+    uint16_t attack = 100;
+    uint16_t release = 200;
 
     AudioGranular()
     {

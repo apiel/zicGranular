@@ -17,3 +17,9 @@ or
 ```sh
 arecord -l
 ```
+
+or
+
+```sh
+aplay -l
+```

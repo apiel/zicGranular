@@ -59,6 +59,9 @@
         "cinttypes": "cpp",
         "list": "cpp",
         "valarray": "cpp",
-        "set": "cpp"
+        "set": "cpp",
+        "pulseaudio.h": "c",
+        "simple.h": "c",
+        "string.h": "c"
     }
 }
