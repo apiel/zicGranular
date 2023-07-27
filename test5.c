@@ -38,7 +38,7 @@ static void rt_pa_set_server_info(pa_context* context, const pa_server_info* inf
 }
 
 // Used to get output device information.
-static void rt_pa_set_sink_info(pa_context* /*c*/, const pa_sink_info* i,
+static void rt_pa_set_sink_info(pa_context* c, const pa_sink_info* i,
     int eol, void* userdata)
 {
     if (eol)
