@@ -19,4 +19,4 @@ build:
 
 run:
 	echo start zicGranular
-	LD_LIBRARY_PATH=. ./zicGranular 0
+	LD_LIBRARY_PATH=. ./zicGranular

@@ -4,14 +4,16 @@
 
 int main(int argc, char* args[])
 {
-    if (strcmp(args[1], "-h") == 0 || strcmp(args[1], "--help") == 0) {
-        APP_PRINT("Usage:\n    %s\n    %s --list\n", args[0], args[0]);
-        return 0;
-    }
+    if (argc > 1) {
+        if (strcmp(args[1], "-h") == 0 || strcmp(args[1], "--help") == 0) {
+            APP_PRINT("Usage:\n    %s\n    %s --list\n", args[0], args[0]);
+            return 0;
+        }
 
-    if (strcmp(args[1], "--list") == 0) {
-        showAudioDeviceInfo();
-        return 0;
+        if (strcmp(args[1], "--list") == 0) {
+            showAudioDeviceInfo();
+            return 0;
+        }
     }
 
     // TODO make config.cfg a parameter

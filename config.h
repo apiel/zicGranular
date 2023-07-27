@@ -42,9 +42,9 @@ void assignMidiMapping(MidiMapping& map, char* value)
 void assignKeyValue(char* key, char* value)
 {
     if (strcmp(key, "MIDIIN") == 0) {
-        loadMidiInput(midiController, trimChar(value), &midiControllerCallback);
+        loadMidiInput(midiController, value, &midiControllerCallback);
     } else if (strcmp(key, "AUDIO_OUTPUT") == 0) {
-        strcpy(audioOutput, trimChar(value));
+        strcpy(audioOutput, value);
         APP_INFO("Audio output set: %s\n", audioOutput);
     } else if (strcmp(key, "GAIN_OUTPUT") == 0) {
         setMasterVolume(masterVolume, atof(value));
@@ -80,7 +80,7 @@ void parseConfigLine(char* line)
         APP_INFO("Invalid config line: %s\n", line);
         return;
     }
-    assignKeyValue(key, value);
+    assignKeyValue(key, trimChar(value));
 }
 
 bool loadConfig()
