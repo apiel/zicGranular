@@ -11,7 +11,6 @@ static void rt_pa_set_server_info(pa_context* context, const pa_server_info* inf
     printf("default sink name: %s\n", info->default_sink_name);
 }
 
-// Used to get output device information.
 static void rt_pa_set_sink_info(pa_context* c, const pa_sink_info* i,
     int eol, void* userdata)
 {
@@ -25,8 +24,6 @@ static void rt_pa_set_sink_info(pa_context* c, const pa_sink_info* i,
     printf("name: %s (outputChannels %d preferredSampleRate %d)\n", name, i->sample_spec.channels, i->sample_spec.rate);
 }
 
-// This is the initial function that is called when the callback is
-// set. This one then calls the functions above.
 static void rt_pa_context_state_callback(pa_context* context, void* userdata)
 {
     pa_mainloop_api* mlApi = (pa_mainloop_api*)userdata;
