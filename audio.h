@@ -13,11 +13,39 @@ int audioCallback(void* outputBuffer, void* /*inputBuffer*/, unsigned int nBuffe
     return 0;
 }
 
+const char * getApiName()
+{
+    switch (audio.getCurrentApi()) {
+    case RtAudio::UNSPECIFIED:
+        return "UNSPECIFIED";
+    case RtAudio::LINUX_ALSA:
+        return "LINUX_ALSA";
+    case RtAudio::LINUX_PULSE:
+        return "LINUX_PULSE";
+    case RtAudio::LINUX_OSS:
+        return "LINUX_OSS";
+    case RtAudio::UNIX_JACK:
+        return "UNIX_JACK";
+    case RtAudio::MACOSX_CORE:
+        return "MACOSX_CORE";
+    case RtAudio::WINDOWS_WASAPI:
+        return "WINDOWS_WASAPI";
+    case RtAudio::WINDOWS_ASIO:
+        return "WINDOWS_ASIO";
+    case RtAudio::WINDOWS_DS:
+        return "WINDOWS_DS";
+    case RtAudio::RTAUDIO_DUMMY:
+        return "RTAUDIO_DUMMY";
+    default:
+        return "?";
+    }
+}
+
 void showAudioDeviceInfo()
 {
     unsigned int deviceCount = audio.getDeviceCount();
 
-    APP_PRINT("Found %d audio devices:\n\n", deviceCount);
+    APP_PRINT("Found %d audio devices (%s):\n\n", deviceCount, getApiName());
     RtAudio::DeviceInfo rtInfo;
     for (unsigned int i = 0; i < deviceCount; i++) {
         rtInfo = audio.getDeviceInfo(i);
@@ -45,7 +73,7 @@ unsigned int getAudioDeviceId(char * name)
     }
     debug("/!\\ Warning /!\\ Audio device %s not found\n", name);
     rtInfo = audio.getDeviceInfo(0);
-    debug("Using default device [%s]\n", rtInfo.name.c_str());
+    debug("Using default %s device [%s]\n", getApiName(), rtInfo.name.c_str());
     return 0;
 }
 
