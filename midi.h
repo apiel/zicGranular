@@ -6,6 +6,8 @@
 #include "fs.h"
 #include "midiMapping.h"
 
+RtMidiIn midiController;
+
 MidiMapping midiMappings[] = {
     MidiMapping("GRAIN_START_POSITION", [](float value) {
         AudioHandler::get().audioGranular.setStart(value);

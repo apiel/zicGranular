@@ -16,6 +16,7 @@ int audioCallback(void* outputBuffer, void* /*inputBuffer*/, unsigned int nBuffe
 
 class AudioRT : public AudioApi {
 protected:
+    RtAudio audio;
     static AudioRT* instance;
     AudioRT() { }
 

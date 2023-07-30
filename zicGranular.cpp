@@ -6,7 +6,7 @@
 #define AUDIO_API_ALSA 2
 
 #ifndef AUDIO_API
-#define AUDIO_API AUDIO_API_ALSA
+// #define AUDIO_API AUDIO_API_ALSA
 #endif
 
 #if AUDIO_API == AUDIO_API_PULSE
