@@ -74,9 +74,7 @@ public:
         while (snd_card_next(&cardNum) > -1 && cardNum > -1) {
             char* name;
             snd_card_get_name(cardNum, &name);
-            APP_PRINT("- %s [AUDIO_OUTPUT=%s]\n", name, name);
-            snd_card_get_longname(cardNum, &name);
-            APP_PRINT("  %s\n", name);
+            APP_PRINT("- %s [AUDIO_OUTPUT=hw:%d,0]\n", name, cardNum);
         }
 
         snd_config_update_free_global();
