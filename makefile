@@ -12,8 +12,8 @@ RTMIDI=`pkg-config --cflags --libs rtmidi`
 
 # AUDIO_API by default will use RT audio
 # else uncomment one of the following to use the other audio API
-# PULSEAUDIO=`pkg-config --cflags --libs libpulse-simple` -DAUDIO_API=1
-ALSA=`pkg-config --cflags --libs alsa` -DAUDIO_API=2
+PULSEAUDIO=`pkg-config --cflags --libs libpulse-simple` -DAUDIO_API=1
+# ALSA=`pkg-config --cflags --libs alsa` -DAUDIO_API=2
 
 BUILD=-Wall zicGranular.cpp -fopenmp -Wno-narrowing $(RTAUDIO) $(LIDSND) $(RTMIDI) $(PULSEAUDIO) $(ALSA)
 
