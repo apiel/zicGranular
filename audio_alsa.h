@@ -55,7 +55,15 @@ public:
 
     void list()
     {
-        printf("to be implemented\n");
+        int cardNum;
+        cardNum = -1;
+        while (snd_card_next(&cardNum) > -1 && cardNum > -1) {
+            char *name;
+            snd_card_get_name(cardNum, &name);
+            APP_PRINT("- %s\n", name);
+        }
+
+        snd_config_update_free_global();
     }
 };
 
