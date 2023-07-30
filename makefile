@@ -10,9 +10,11 @@ RTAUDIO=`pkg-config --cflags --libs rtaudio`
 
 RTMIDI=`pkg-config --cflags --libs rtmidi`
 
-PULSEAUDIO=`pkg-config --cflags --libs libpulse-simple` -DAUDIO_API=1
+# PULSEAUDIO=`pkg-config --cflags --libs libpulse-simple` -DAUDIO_API=1
 
-BUILD=-Wall zicGranular.cpp -fopenmp -Wno-narrowing $(RTAUDIO) $(LIDSND) $(RTMIDI) $(PULSEAUDIO)
+ALSA=`pkg-config --cflags --libs alsa` -DAUDIO_API=2
+
+BUILD=-Wall zicGranular.cpp -fopenmp -Wno-narrowing $(RTAUDIO) $(LIDSND) $(RTMIDI) $(PULSEAUDIO) $(ALSA)
 
 linux: build run
 

@@ -58,7 +58,7 @@ protected:
             if (rtInfo.probed == true) {
                 // APP_PRINT(" (%d) %s", i, rtInfo.name.c_str());
                 // APP_PRINT("  (chan: %d, sampleRate: %d)\n", rtInfo.outputChannels, rtInfo.preferredSampleRate);
-                APP_PRINT(" (%d) %s\n", i, rtInfo.name.c_str());
+                APP_PRINT(" (%d) %s [AUDIO_OUTPUT=%s]\n", i, rtInfo.name.c_str(), rtInfo.name.c_str());
             }
         }
         APP_PRINT("\n");
@@ -94,6 +94,8 @@ public:
 
     int open()
     {
+        APP_PRINT("RT audio::open\n");
+
         RtAudio::StreamParameters audioParams;
 
         // TODO should sample rate come from RtAudio::DeviceInfo  ?

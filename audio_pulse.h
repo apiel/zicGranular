@@ -107,6 +107,8 @@ public:
 
     int open()
     {
+        APP_PRINT("AudioPulse::open\n");
+
         static const pa_sample_spec streamFormat = {
             .format = PA_SAMPLE_FLOAT32LE,
             .rate = SAMPLE_RATE,

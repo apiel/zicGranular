@@ -3,14 +3,18 @@
 #include "def.h"
 
 #define AUDIO_API_PULSE 1
+#define AUDIO_API_ALSA 2
 
 #ifndef AUDIO_API
-// #define AUDIO_API AUDIO_API_PULSE
+#define AUDIO_API AUDIO_API_ALSA
 #endif
 
 #if AUDIO_API == AUDIO_API_PULSE
 #include "audio_pulse.h"
 AudioApi& audioApi = AudioPulse::get();
+#elif AUDIO_API == AUDIO_API_ALSA
+#include "audio_alsa.h"
+AudioApi& audioApi = AudioAlsa::get();
 #else
 #include "audio_rt.h"
 AudioApi& audioApi = AudioRT::get();

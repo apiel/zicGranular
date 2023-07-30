@@ -33,7 +33,7 @@ MidiMapping midiMappings[] = {
     }),
     MidiMapping("SAMPLE_SELECTOR", [](float value) {
         FileBrowser& fileBrowser = AudioHandler::get().fileBrowser;
-        uint8_t position = fileBrowser.count * value;
+        uint8_t position = range(value * 127, 0, fileBrowser.count);
         if (position != fileBrowser.position) {
             char *file = fileBrowser.getFile(position);
             debug("SAMPLE_SELECTOR: %f %s\n", value, file);
